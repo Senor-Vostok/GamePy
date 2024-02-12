@@ -13,7 +13,6 @@ class Tree(pygame.sprite.Sprite):
         return (self.rect.x + 90, self.rect.y + 140)
 
     def select(self):
-        print(self.get_cord())
         if not self.sel:
             self.image = pygame.image.load('data/objects/tree_select.png').convert_alpha()
             self.sel = True

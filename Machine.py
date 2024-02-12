@@ -10,6 +10,7 @@ class World:
                      '🟩': pygame.image.load('data/ground/forest.png').convert_alpha(),
                      '🟦': pygame.image.load('data/ground/water.png').convert_alpha(),
                      '⬛': pygame.image.load('data/ground/stone.png').convert_alpha()}
+        self.fix_move = [0, 0]
         self.obj = obj[0]
         self.sel_obj = obj[1]
         self.bioms = bioms
@@ -74,6 +75,7 @@ class World:
         self.win.fill((0, 0, 0))
         self.now_dr[0] += move[0]
         self.now_dr[1] += move[1]
+        self.fix_move = [move[0], move[1]]
 
         self.move_scene()
 
@@ -116,8 +118,8 @@ class World:
         for i in range(self.sq):
             for j in range(self.sq):
                 sprite = Ground(self.land[self.bioms[self.world_cord[0] + i][self.world_cord[1] + j]], (
-                self.now_dr[0] + j * self.gr_main + self.gr_main // 2,
-                self.now_dr[1] + i * self.gr_main + self.gr_main // 2))
+                self.now_dr[0] + j * self.gr_main + self.gr_main // 2 - self.fix_move[0],
+                self.now_dr[1] + i * self.gr_main + self.gr_main // 2 - self.fix_move[1]))
                 self.great_world.add(sprite)
 
     def create_objects(self, stor='static'):
