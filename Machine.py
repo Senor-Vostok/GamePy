@@ -27,7 +27,7 @@ class World:
         self.character = pygame.sprite.Group(MCharacter((self.centre[0], self.centre[1] - 60)))
 
     def move_scene(self):
-        if max(self.now_dr[0], self.start_dr[0]) - min(self.now_dr[0], self.start_dr[0]) >= self.gr_main:
+        if max(self.now_dr[0], self.start_dr[0]) - min(self.now_dr[0], self.start_dr[0]) > self.gr_main:
             res = self.now_dr[0] > self.start_dr[0]
             self.now_dr[0] = self.now_dr[0] - self.gr_main if res else self.now_dr[0] + self.gr_main
             if res:
@@ -37,7 +37,7 @@ class World:
                 self.world_cord[1] += 1
                 self.create_objects('right')
             self.create_ground()
-        elif max(self.now_dr[1], self.start_dr[1]) - min(self.now_dr[1], self.start_dr[1]) >= self.gr_main:
+        elif max(self.now_dr[1], self.start_dr[1]) - min(self.now_dr[1], self.start_dr[1]) > self.gr_main:
             res = self.now_dr[1] > self.start_dr[1]
             self.now_dr[1] = self.now_dr[1] - self.gr_main if res else self.now_dr[1] + self.gr_main
             if res:
@@ -51,13 +51,15 @@ class World:
     def check_barrier(self, move):
         square = self.sq // 2
         for i in range(square - 1, square + 2):
+
             for obj in self.trees_list[i]:
                 if obj:
                     coord = obj.get_cord()
-                    if coord[1] + 100 in range(self.centre[1], self.centre[1] + 3) and coord[0] in range(self.centre[0] - 20, self.centre[0] + 20):
+                    if coord[1] + 100 + move[1] in range(self.centre[1], self.centre[1] + 20) and coord[0] + move[0] in range(self.centre[0] - 30, self.centre[0] + 50):
                         self.now_dr[0] -= move[0]
                         self.now_dr[1] -= move[1]
                         return True
+
             for j in range(square - 1, square + 2):
                 res = self.now_dr[0] + j * self.gr_main in range(self.centre[0] - self.gr_main, self.centre[0]) and \
                       self.now_dr[1] + i * self.gr_main in range(self.centre[1] - self.gr_main, self.centre[1])
