@@ -1,0 +1,87 @@
+import pygame
+from Machine import World
+from Generation import Generation
+import sys
+from win32api import GetSystemMetrics
+
+width = GetSystemMetrics(0)
+height = GetSystemMetrics(1)
+centre = (width // 2, height // 2)
+fps = 75
+pygame.init()
+win = pygame.display.set_mode((width, height))
+
+clock = pygame.time.Clock()
+
+win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
+
+pygame.display.update()
+speed = 3
+
+sp = [('🟨') for _ in range(4)] + [('🟩') for _ in range(20)] + [('🟦') for _ in range(1)] + [('⬛')]
+
+gen = Generation(sp, 200)
+world_pos_x = 20
+world_pos_y = 20
+gen.generation()
+gen.smoof_generation()
+gen.smoof_generation(False, True, False)
+matr_worls = gen.add_barier(15)
+
+for i in matr_worls:
+    print(''.join(i))
+obj = gen.xy_objects()
+world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj, width)
+world.create_ground()
+world.create_objects()
+
+count_x = 0
+count_y = 0
+flag = False
+
+move = [0, 0]
+
+way = 'stay'
+
+
+def action():
+    if move[1] < 0:
+        return 'back'
+    elif move[1] > 0:
+        return 'forward'
+    elif move[0] < 0:
+        return 'right'
+    elif move[0] > 0:
+        return 'left'
+    else:
+        return 'stay'
+
+
+while True:
+    clock.tick(fps)
+    for i in pygame.event.get():
+        if i.type == pygame.QUIT:
+            sys.exit()
+        elif i.type == pygame.KEYDOWN:
+            flag = False
+            if i.key == pygame.K_w:
+                move[1] = speed
+            if i.key == pygame.K_s:
+                move[1] = -speed
+            if i.key == pygame.K_a:
+                move[0] = speed
+            if i.key == pygame.K_d:
+                move[0] = -speed
+        elif i.type == pygame.KEYUP:
+            if i.key == pygame.K_w or i.key == pygame.K_s:
+                move[1] = 0
+            if i.key == pygame.K_a or i.key == pygame.K_d:
+                move[0] = 0
+        elif i.type == pygame.MOUSEBUTTONDOWN:
+            flag = world.check_select(i.pos[0], i.pos[1])
+        elif i.type == pygame.MOUSEBUTTONUP:
+            flag = world.check_select(i.pos[0], i.pos[1])
+    world.draw(move)
+    world.update_character(action())
+    pygame.draw.circle(win, (255,0,0), (960, 540), 5)
+    pygame.display.update()
