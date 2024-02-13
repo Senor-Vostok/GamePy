@@ -7,7 +7,11 @@ class Tree(pygame.sprite.Sprite):
         self.sel = False
         self.image = pygame.image.load('data/objects/tree.png').convert_alpha()
         self.xoy = (first_block[0] + obj[0][0], first_block[1] + obj[0][1] - 100)
+        self.colision = [(30, 50), (0, 20)]  # относительное смещение по x и по y для проверки пересечения в точке
         self.rect = self.image.get_rect(center=self.xoy)
+
+    def iscolision(self):
+        return self.colision
 
     def get_cord(self):
         return (self.rect.x + 90, self.rect.y + 140)

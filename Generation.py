@@ -60,7 +60,7 @@ class Generation():
                 klak = list()
                 llack = list()
                 if this_biom == '🟩':
-                    if random.randint(0, 1) == 1:
+                    if random.randint(0, 2) == 1:
                         random_x = random.randint(70, 130)
                         random_y = random.randint(30, 150)
                         klak.append([(instx + random_x, insty + random_y), 'tree', random.randint(0, 1)])

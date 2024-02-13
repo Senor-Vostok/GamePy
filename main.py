@@ -7,7 +7,7 @@ from win32api import GetSystemMetrics
 width = GetSystemMetrics(0)
 height = GetSystemMetrics(1)
 centre = (width // 2, height // 2)
-fps = 90
+fps = 75
 pygame.init()
 win = pygame.display.set_mode((width, height))
 
@@ -27,9 +27,8 @@ gen.generation()
 gen.smoof_generation()
 gen.smoof_generation(False, True, False)
 matr_worls = gen.add_barier(15)
+gen.smoof_generation()
 
-for i in matr_worls:
-    print(''.join(i))
 obj = gen.xy_objects()
 world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj, width)
 world.create_ground()

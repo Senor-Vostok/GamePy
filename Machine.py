@@ -15,7 +15,7 @@ class World:
         self.sel_obj = obj[1]
         self.bioms = bioms
         self.gr_main = 180
-        self.sq = width // self.gr_main + 5
+        self.sq = width // self.gr_main + 3
         self.win = win
         self.centre = centre
         self.start_dr = [self.centre[0] - self.gr_main // 2 - (self.sq // 2) * self.gr_main,
@@ -56,12 +56,13 @@ class World:
             for obj in self.trees_list[i]:
                 if obj:
                     coord = obj.get_cord()
-                    if coord[1] + 100 + move[1] in range(self.centre[1], self.centre[1] + 20) and coord[0] + move[0] in range(self.centre[0] - 30, self.centre[0] + 50):
+                    col = obj.iscolision()
+                    if coord[1] + 100 + move[1] in range(self.centre[1] - col[1][0], self.centre[1] + col[1][1]) and coord[0] + move[0] in range(self.centre[0] - col[0][0], self.centre[0] + col[0][1]):
                         self.now_dr[0] -= move[0]
                         self.now_dr[1] -= move[1]
                         return True
 
-            for j in range(square - 1, square + 2):
+            for j in range(square - 1, square + 2):  # проверка пересечения с биомом, не менять!
                 res = self.now_dr[0] + j * self.gr_main in range(self.centre[0] - self.gr_main, self.centre[0]) and \
                       self.now_dr[1] + i * self.gr_main in range(self.centre[1] - self.gr_main, self.centre[1])
                 if res:
