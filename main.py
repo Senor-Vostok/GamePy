@@ -7,7 +7,7 @@ from win32api import GetSystemMetrics
 width = GetSystemMetrics(0)
 height = GetSystemMetrics(1)
 centre = (width // 2, height // 2)
-fps = 75
+fps = 100
 pygame.init()
 win = pygame.display.set_mode((width, height))
 
@@ -81,5 +81,4 @@ while True:
         elif i.type == pygame.MOUSEBUTTONUP:
             flag = world.check_select(i.pos[0], i.pos[1])
     world.draw(move, action())
-    pygame.draw.circle(win, (255,0,0), (960, 540), 5)
     pygame.display.update()

@@ -8,6 +8,6 @@ class Ground(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=xoy)
 
     def update(self, move, y_n):
-        if not y_n:
+        if y_n:
             self.rect.y += move[1]
             self.rect.x += move[0]

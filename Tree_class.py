@@ -14,7 +14,7 @@ class Tree(pygame.sprite.Sprite):
         return self.colision
 
     def get_cord(self):
-        return (self.rect.x + 90, self.rect.y + 140)
+        return self.rect.x + 90, self.rect.y + 140
 
     def select(self):
         if not self.sel:
@@ -28,6 +28,6 @@ class Tree(pygame.sprite.Sprite):
         screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def update(self, move, y_n):
-        if not y_n:
+        if y_n:
             self.rect.y += move[1]
             self.rect.x += move[0]
