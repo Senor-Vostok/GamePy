@@ -22,7 +22,7 @@ class Generation():
         self.procent[0][0] = 10
         self.masbiom[0][0] = random.choice(self.bioms)
 
-    def smoof_generation(self, fl1=True, fl2=True, fl3=True):
+    def smoof_generation(self, count = 0, fl1=True, fl2=True, fl3=True):
         for i in range(1, len(self.masbiom) - 1):
             for j in range(1, len(self.masbiom[i]) - 1):
                 self.masbiom[i][j] = random.choice([self.masbiom[i - 1][j], self.masbiom[i + 1][j], self.masbiom[i][j + 1], self.masbiom[i][j - 1]])
@@ -37,7 +37,9 @@ class Generation():
                         self.masbiom[i][j] = max(spis)
                 elif spis.count(max(spis)) < spis.count(min(spis)) and fl3:
                         self.masbiom[i][j] = min(spis)
-        return self.masbiom
+        if count == 0:
+            return self.masbiom
+        return self.smoof_generation(count - 1, fl1, fl2, fl3)
 
     def reversive_world(self):
         new_world = list()
@@ -60,7 +62,7 @@ class Generation():
                 klak = list()
                 llack = list()
                 if this_biom == '🟩':
-                    if random.randint(0, 2) == 1:
+                    if random.randint(0, 3) == 1:
                         random_x = random.randint(70, 130)
                         random_y = random.randint(30, 150)
                         klak.append([(instx + random_x, insty + random_y), 'tree', random.randint(0, 1)])

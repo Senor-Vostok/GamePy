@@ -17,7 +17,7 @@ class World:
 
         self.bioms = bioms
         self.gr_main = 180
-        self.sq = width // self.gr_main + 4
+        self.sq = width // self.gr_main + 3
 
         self.win = win
 
