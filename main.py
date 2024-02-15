@@ -16,7 +16,7 @@ clock = pygame.time.Clock()
 win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
 
 pygame.display.update()
-speed = 3
+speed = 2
 
 sp = [('🟨') for _ in range(4)] + [('🟩') for _ in range(20)] + [('🟦') for _ in range(1)] + [('⬛')]
 

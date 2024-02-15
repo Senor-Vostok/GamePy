@@ -4,7 +4,7 @@ import pygame
 
 
 class Tree(pygame.sprite.Sprite):
-    def __init__(self, first_block, obj):
+    def __init__(self, first_block, obj, animation):
         pygame.sprite.Sprite.__init__(self)
         self.sel = False
         self.image = pygame.image.load('data/objects/tree.png').convert_alpha()
@@ -13,11 +13,12 @@ class Tree(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.xoy)
 
         self.is_animated = False
+        self.animation = animation
         self.second_animation = 0
         self.speed_animation = 30
 
-    def start_animation(self, stadia):
-        self.image = pygame.image.load(f'data/objects/tree_animations/shake{stadia}.png').convert_alpha()
+    def self_animation(self, stadia):
+        self.image = self.animation[stadia - 1]
 
     def iscolision(self):
         return self.colision
@@ -38,14 +39,16 @@ class Tree(pygame.sprite.Sprite):
 
     def update(self, move, y_n):
         if not self.is_animated:
-            self.is_animated = random.randint(1, 10000) == 2
+            self.is_animated = random.randint(1, 10000) == 1
         else:
             self.second_animation += 1
             stadia = self.second_animation // self.speed_animation + 1
-            if stadia <= 4:
-                self.start_animation(stadia)
+            if stadia <= len(self.animation):
+                self.self_animation(stadia)
             else:
+                self.second_animation = 0
                 self.is_animated = False
+
         if y_n:
             self.rect.y += move[1]
             self.rect.x += move[0]
