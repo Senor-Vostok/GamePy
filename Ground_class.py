@@ -4,9 +4,8 @@ import pygame
 class Ground(pygame.sprite.Sprite):
     def __init__(self, image, xoy, name, animation=None):
         pygame.sprite.Sprite.__init__(self)
-        if name == '🟦':
+        if name == 'water':
             self.water_animation = animation
-            name = 'water'
         self.name = name
         self.image = image
         self.rect = self.image.get_rect(center=xoy)

@@ -61,7 +61,7 @@ class Generation():
                 insty = i * 180
                 klak = list()
                 llack = list()
-                if this_biom == '🟩':
+                if this_biom == 'forest':
                     if random.randint(0, 3) == 1:
                         random_x = random.randint(70, 130)
                         random_y = random.randint(30, 150)
@@ -79,14 +79,23 @@ class Generation():
             self.select_cord_objects.append(prom2)
         return [self.coord_objects, self.select_cord_objects]
 
+    def weathering(self):
+        for i in range(1, len(self.masbiom) - 1):
+            for j in range(1, len(self.masbiom[i]) - 1):
+                close = [self.masbiom[i - 1][j - 1], self.masbiom[i - 1][j], self.masbiom[i - 1][j + 1],
+                         self.masbiom[i][j - 1], self.masbiom[i][j + 1],
+                         self.masbiom[i + 1][j - 1], self.masbiom[i + 1][j], self.masbiom[i + 1][j + 1]]
+                if 'water' in close and self.masbiom[i][j] != 'water' and random.randint(1, 10):
+                    self.masbiom[i][j] = 'sand'
+
     def add_barier(self, size):
         for i in range(self.masive + size * 2):
             if i < size:
-                self.masbiom.insert(0, ['🟦'] * (self.masive + size * 2))
+                self.masbiom.insert(0, ['water'] * (self.masive + size * 2))
             elif i >= self.masive + size:
-                self.masbiom.append(['🟦'] * (self.masive + size * 2))
+                self.masbiom.append(['water'] * (self.masive + size * 2))
             else:
-                self.masbiom[i] = ['🟦'] * size + self.masbiom[i] + ['🟦'] * size
+                self.masbiom[i] = ['water'] * size + self.masbiom[i] + ['water'] * size
         return self.masbiom
 
     def generation(self):

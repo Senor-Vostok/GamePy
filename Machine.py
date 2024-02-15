@@ -10,10 +10,11 @@ class World:
                                 in range(1, 5)]
         self.tree_animation = [pygame.image.load(f'data/animations/tree_animations/shake{i}.png').convert_alpha() for i
                                in range(1, 6)]
-        self.land = {'🟨': pygame.image.load('data/ground/grass.png').convert_alpha(),
-                     '🟩': pygame.image.load('data/ground/forest.png').convert_alpha(),
-                     '🟦': pygame.image.load('data/ground/water.png').convert_alpha(),
-                     '⬛': pygame.image.load('data/ground/stone.png').convert_alpha()}
+        self.land = {'flower': pygame.image.load('data/ground/grass.png').convert_alpha(),
+                     'forest': pygame.image.load('data/ground/forest.png').convert_alpha(),
+                     'water': pygame.image.load('data/ground/water.png').convert_alpha(),
+                     'stone': pygame.image.load('data/ground/stone.png').convert_alpha(),
+                     'sand': pygame.image.load('data/ground/sand.png').convert_alpha()}
 
         self.obj = obj[0]
         self.sel_obj = obj[1]
@@ -31,7 +32,7 @@ class World:
                          self.centre[1] - self.gr_main // 2 - (self.sq // 2) * self.gr_main]
         self.now_dr = [self.centre[0] - self.gr_main // 2 - (self.sq // 2) * self.gr_main,
                        self.centre[1] - self.gr_main // 2 - (self.sq // 2) * self.gr_main]
-        self.move_barrier = (50, 50)
+        self.move_barrier = (70, 50)
 
         self.great_world = pygame.sprite.Group()
         self.trees_list = [[None for _ in range(self.sq)] for _ in range(self.sq)]
@@ -81,7 +82,7 @@ class World:
                 pygame.draw.rect(self.win, (0, 0, 255), (
                 self.now_dr[0] + i * self.gr_main, self.now_dr[1] + j * self.gr_main, self.gr_main, self.gr_main), 5)
                 if res:
-                    if self.bioms[self.world_cord[0] + j][self.world_cord[1] + i] == '🟦':
+                    if self.bioms[self.world_cord[0] + j][self.world_cord[1] + i] == 'water':
                         return False
         return True
 
@@ -120,10 +121,10 @@ class World:
                     coord = obj.get_cord()
                     if coord[1] + 100 <= self.centre[1] and coord[0] in range(self.centre[0] - 90, self.centre[0] + 90):
                         self.character.draw(self.win)
-        # pygame.draw.rect(self.win, (255, 0, 0), (
-        # self.global_centre[0] - self.move_barrier[0], self.global_centre[1] - self.move_barrier[1],
-        # self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
-        # self.check_barrier(move, self.centre)
+        #pygame.draw.rect(self.win, (255, 0, 0), (
+        #self.global_centre[0] - self.move_barrier[0], self.global_centre[1] - self.move_barrier[1],
+        #self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
+        #self.check_barrier(move, self.centre)
 
     def check_select(self, mouse_x, mouse_y):
         flag = False
@@ -149,10 +150,10 @@ class World:
         self.great_world = pygame.sprite.Group()
         for i in range(self.sq):
             for j in range(self.sq):
-                if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == '🟦':
+                if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
                     sprite = Ground(self.land[self.bioms[self.world_cord[0] + i][self.world_cord[1] + j]], (
                         self.now_dr[0] + j * self.gr_main + self.gr_main // 2,
-                        self.now_dr[1] + i * self.gr_main + self.gr_main // 2), '🟦', self.water_animation)
+                        self.now_dr[1] + i * self.gr_main + self.gr_main // 2), 'water', self.water_animation)
                 else:
                     sprite = Ground(self.land[self.bioms[self.world_cord[0] + i][self.world_cord[1] + j]], (
                         self.now_dr[0] + j * self.gr_main + self.gr_main // 2,

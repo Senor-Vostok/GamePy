@@ -16,9 +16,9 @@ clock = pygame.time.Clock()
 win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
 
 pygame.display.update()
-speed = 2
+speed = 288 // fps
 
-sp = [('🟨') for _ in range(4)] + [('🟩') for _ in range(20)] + [('🟦') for _ in range(1)] + [('⬛')]
+sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone')]
 
 gen = Generation(sp, 200)
 world_pos_x = 20
@@ -28,6 +28,7 @@ gen.smoof_generation()
 gen.smoof_generation(0, False, True, False)
 matr_worls = gen.add_barier(15)
 gen.smoof_generation(10)
+gen.weathering()
 
 obj = gen.xy_objects()
 world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj, width)
@@ -63,6 +64,8 @@ while True:
             sys.exit()
         elif i.type == pygame.KEYDOWN:
             flag = False
+            if i.key == pygame.K_F1:
+                speed = speed * 2
             if i.key == pygame.K_w:
                 move[1] = speed
             if i.key == pygame.K_s:
