@@ -89,4 +89,3 @@ while True:
             exit()
     world.draw(move, action())
     pygame.display.update()
-aaaa
