@@ -10,6 +10,7 @@ height = GetSystemMetrics(1)
 centre = (width // 2, height // 2)
 pygame.init()
 win = pygame.display.set_mode((width, height))
+my_font = pygame.font.SysFont('Futura book C', 30)
 
 clock = pygame.time.Clock()
 
@@ -90,13 +91,12 @@ while True:
             flag = world.select((i.pos[0], i.pos[1]))
     world.draw(move, action())
     b = datetime.now().microsecond
-    my_font = pygame.font.SysFont('Futura book C', 30)
     true_fps = 1000000 // (b - a)
     if speed != const_for_speed // true_fps and true_fps > 0:
         speed = const_for_speed // true_fps
         if move[0]: move[0] = const_for_speed // true_fps * (abs(move[0]) // move[0])
         if move[1]: move[1] = const_for_speed // true_fps * (abs(move[1]) // move[1])
-    fpstxt = my_font.render(f'fps - {abs(true_fps)}', False, (255, 0, 0))
+    fpstxt = my_font.render(f'fps - {abs(true_fps)}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
     speedtxt = my_font.render(f'speed - {speed}', False, (255, 0, 0))
     win.blit(fpstxt, (20, 100))
     win.blit(speedtxt, (20, 130))
