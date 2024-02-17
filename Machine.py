@@ -23,21 +23,22 @@ class World:
 
         self.bioms = bioms
         self.gr_main = 180
-        self.sq = width // self.gr_main + 3
+        self.sq1 = centre[0] * 2 // self.gr_main + 3 if centre[0] * 2 // self.gr_main % 2 == 0 else centre[0] * 2 // self.gr_main + 2
+        self.sq2 = centre[1] * 2 // self.gr_main + 5 if centre[1] * 2 // self.gr_main % 2 == 0 else centre[1] * 2 // self.gr_main + 4
 
         self.win = win
 
         self.centre = centre
         self.global_centre = [centre[0], centre[1]]
 
-        self.start_dr = [self.centre[0] - self.gr_main // 2 - (self.sq // 2) * self.gr_main,
-                         self.centre[1] - self.gr_main // 2 - (self.sq // 2) * self.gr_main]
-        self.now_dr = [self.centre[0] - self.gr_main // 2 - (self.sq // 2) * self.gr_main,
-                       self.centre[1] - self.gr_main // 2 - (self.sq // 2) * self.gr_main]
+        self.start_dr = [self.centre[0] - self.gr_main // 2 - (self.sq1 // 2) * self.gr_main,
+                         self.centre[1] - self.gr_main // 2 - (self.sq2 // 2) * self.gr_main]
+        self.now_dr = [self.centre[0] - self.gr_main // 2 - (self.sq1 // 2) * self.gr_main,
+                       self.centre[1] - self.gr_main // 2 - (self.sq2 // 2) * self.gr_main]
         self.move_barrier = (70, 50)
 
         self.great_world = pygame.sprite.Group()
-        self.trees_list = [[None for _ in range(self.sq)] for _ in range(self.sq)]
+        self.trees_list = [[None for _ in range(self.sq1)] for _ in range(self.sq2)]
 
         self.world_cord = cord
 
@@ -68,8 +69,7 @@ class World:
             self.create_ground()
 
     def check_barrier(self, move, point):
-        square = self.sq // 2
-        for i in range(square - 1, square + 2):
+        for i in range(self.sq2 // 2 - 1, self.sq2 // 2 + 2):
             for obj in self.trees_list[i]:
                 if obj:
                     coord = obj.get_cord()
@@ -78,15 +78,15 @@ class World:
                             move[0] in range(point[0] - col[0][0], point[0] + col[0][1]):
                         return False
 
-            for j in range(square - 1, square + 2):
-                res = point[0] - move[0] in range(self.now_dr[0] + i * self.gr_main,
-                                                  self.now_dr[0] + i * self.gr_main + self.gr_main) and \
-                      point[1] - move[1] in range(self.now_dr[1] + j * self.gr_main,
-                                                  self.now_dr[1] + j * self.gr_main + self.gr_main)
+            for j in range(self.sq1 // 2 - 1, self.sq1 // 2 + 2):
+                res = point[0] - move[0] in range(self.now_dr[0] + j * self.gr_main,
+                                                  self.now_dr[0] + j * self.gr_main + self.gr_main) and \
+                      point[1] - move[1] in range(self.now_dr[1] + i * self.gr_main,
+                                                  self.now_dr[1] + i * self.gr_main + self.gr_main)
                 pygame.draw.rect(self.win, (0, 0, 255), (
-                self.now_dr[0] + i * self.gr_main, self.now_dr[1] + j * self.gr_main, self.gr_main, self.gr_main), 5)
+                self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
                 if res:
-                    if self.bioms[self.world_cord[0] + j][self.world_cord[1] + i] == 'water':
+                    if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
                         return False
         return True
 
@@ -133,13 +133,13 @@ class World:
 
     def select(self, there):
         for obj_interface in self.interface:
-            if obj_interface.rect.colliderect(there[0], there[1], 1, 1):
+            if obj_interface.rect.colliderect(there[0], there[1], 1, 1) and obj_interface.myname() == 'quit':
                 return 'quit'
 
     def create_ground(self):
         self.great_world = pygame.sprite.Group()
-        for i in range(self.sq):
-            for j in range(self.sq):
+        for i in range(self.sq2):
+            for j in range(self.sq1):
                 if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
                     sprite = Ground(self.land[self.bioms[self.world_cord[0] + i][self.world_cord[1] + j]], (
                         self.now_dr[0] + j * self.gr_main + self.gr_main // 2,
@@ -150,43 +150,43 @@ class World:
                         self.now_dr[1] + i * self.gr_main + self.gr_main // 2), None)
                 self.great_world.add(sprite)
 
-    def add_object(self, j, i, obj, first_block):
+    def add_object(self, i, j, obj, first_block):
         if obj[1] == 'tree':
-            self.trees_list[j][i] = Tree(first_block, obj, self.tree_animation)
+            self.trees_list[i][j] = Tree(first_block, obj, self.tree_animation)
         elif obj[1] == 'stone':
-            self.trees_list[j][i] = Stone(first_block, obj, self.tree_animation)
+            self.trees_list[i][j] = Stone(first_block, obj, self.tree_animation)
 
     def create_objects(self, stor='static'):
         first_block = [self.now_dr[0] - self.world_cord[1] * self.gr_main,
                        self.now_dr[1] - self.world_cord[0] * self.gr_main]
         if stor == 'up':
             self.trees_list = self.trees_list[:-1]
-            self.trees_list.insert(0, [None for _ in range(self.sq)])
-            for i in range(self.sq):
+            self.trees_list.insert(0, [None for _ in range(self.sq1)])
+            for i in range(self.sq1):
                 for obj in self.obj[self.world_cord[0]][self.world_cord[1] + i]:
                     self.add_object(0, i, obj, first_block)
         elif stor == 'down':
             self.trees_list = self.trees_list[1:]
-            self.trees_list.insert(self.sq, [None for _ in range(self.sq)])
-            for i in range(self.sq):
-                for obj in self.obj[self.world_cord[0] + self.sq - 1][self.world_cord[1] + i]:
-                    self.add_object(self.sq - 1, i, obj, first_block)
+            self.trees_list.insert(self.sq1, [None for _ in range(self.sq1)])
+            for i in range(self.sq1):
+                for obj in self.obj[self.world_cord[0] + self.sq2 - 1][self.world_cord[1] + i]:
+                    self.add_object(self.sq2 - 1, i, obj, first_block)
         elif stor == 'left':
-            for i in range(self.sq):
+            for i in range(self.sq2):
                 self.trees_list[i] = self.trees_list[i][:-1]
                 self.trees_list[i].insert(0, None)
-            for i in range(self.sq):
+            for i in range(self.sq2):
                 for obj in self.obj[self.world_cord[0] + i][self.world_cord[1]]:
                     self.add_object(i, 0, obj, first_block)
         elif stor == 'right':
-            for i in range(self.sq):
+            for i in range(self.sq2):
                 self.trees_list[i] = self.trees_list[i][1:]
-                self.trees_list[i].insert(self.sq - 1, None)
-            for i in range(self.sq):
-                for obj in self.obj[self.world_cord[0] + i][self.world_cord[1] + self.sq - 1]:
-                    self.add_object(i, self.sq - 1, obj, first_block)
+                self.trees_list[i].insert(self.sq1 - 1, None)
+            for i in range(self.sq2):
+                for obj in self.obj[self.world_cord[0] + i][self.world_cord[1] + self.sq1 - 1]:
+                    self.add_object(i, self.sq1 - 1, obj, first_block)
         else:
-            for i in range(self.world_cord[0], self.world_cord[0] + self.sq):
-                for j in range(self.world_cord[1], self.world_cord[1] + self.sq):
+            for i in range(self.world_cord[0], self.world_cord[0] + self.sq2):
+                for j in range(self.world_cord[1], self.world_cord[1] + self.sq1):
                     for obj in self.obj[i][j]:
                         self.add_object(i - self.world_cord[0], j - self.world_cord[1], obj, first_block)

@@ -1,4 +1,5 @@
 import pygame
+from datetime import datetime
 from Machine import World
 from Generation import Generation
 import sys
@@ -7,7 +8,6 @@ from win32api import GetSystemMetrics
 width = GetSystemMetrics(0)
 height = GetSystemMetrics(1)
 centre = (width // 2, height // 2)
-fps = 144
 pygame.init()
 win = pygame.display.set_mode((width, height))
 
@@ -16,9 +16,12 @@ clock = pygame.time.Clock()
 win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
 
 pygame.display.update()
-speed = 288 // fps
+normal_fps = 144
+speed = 3
+const_for_speed = normal_fps * speed
 
-sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(8)]
+sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _
+                                                                                                         in range(2)]
 
 gen = Generation(sp, 200)
 world_pos_x = 20
@@ -58,7 +61,7 @@ def action():
 
 
 while True:
-    clock.tick(fps)
+    a = datetime.now().microsecond
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             sys.exit()
@@ -85,7 +88,21 @@ while True:
             flag = world.select((i.pos[0], i.pos[1]))
         elif i.type == pygame.MOUSEBUTTONUP:
             flag = world.select((i.pos[0], i.pos[1]))
-        if flag == 'quit':
-            exit()
     world.draw(move, action())
+    b = datetime.now().microsecond
+    my_font = pygame.font.SysFont('Futura book C', 30)
+    true_fps = 1000000 // (b - a)
+    if speed != const_for_speed // true_fps and true_fps > 0:
+        speed = const_for_speed // true_fps
+        if move[0]: move[0] = const_for_speed // true_fps * (abs(move[0]) // move[0])
+        if move[1]: move[1] = const_for_speed // true_fps * (abs(move[1]) // move[1])
+    fpstxt = my_font.render(f'fps - {abs(true_fps)}', False, (255, 0, 0))
+    speedtxt = my_font.render(f'speed - {speed}', False, (255, 0, 0))
+    win.blit(fpstxt, (20, 100))
+    win.blit(speedtxt, (20, 130))
+
     pygame.display.update()
+    if flag == 'quit':
+        pygame.display.quit()
+        print('Good bye!')
+        break

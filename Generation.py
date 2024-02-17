@@ -55,7 +55,7 @@ class Generation:
         return new_world
 
     def add_on_world(self, klak, llack, chance, instx, insty, name):
-        if random.randint(0, chance) == 1:
+        if random.randint(1, chance) == 1:
             random_x = random.randint(70, 130)
             random_y = random.randint(30, 150)
             klak.append([(instx + random_x, insty + random_y), name, random.randint(0, 1)])
@@ -75,9 +75,9 @@ class Generation:
                 klak = list()
                 llack = list()
                 if this_biom == 'forest':
-                    self.add_on_world(klak, llack, 3, instx, insty, 'tree')
+                    self.add_on_world(klak, llack, 4, instx, insty, 'tree')
                 elif this_biom == 'stone':
-                    self.add_on_world(klak, llack, 8, instx, insty, 'stone')
+                    self.add_on_world(klak, llack, 9, instx, insty, 'stone')
                 else:
                     klak.append([(0, 0), 'None'])
                     llack.append([(0, 0), 'None'])
@@ -93,7 +93,7 @@ class Generation:
                 close = [self.masbiom[i - 1][j - 1], self.masbiom[i - 1][j], self.masbiom[i - 1][j + 1],
                          self.masbiom[i][j - 1], self.masbiom[i][j + 1], self.masbiom[i + 1][j - 1],
                          self.masbiom[i + 1][j], self.masbiom[i + 1][j + 1]]
-                if 'water' in close and self.masbiom[i][j] != 'water' and random.randint(1, 10):
+                if 'water' in close and self.masbiom[i][j] != 'water' and self.masbiom[i][j] != 'forest':
                     self.masbiom[i][j] = 'sand'
 
     def add_barier(self, size):
