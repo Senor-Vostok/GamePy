@@ -11,10 +11,13 @@ class Ground(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=xoy)
 
         self.second_animation = 0
-        self.speed_animation = 80
+        self.speed_animation = 50
 
     def self_animation(self, stadia):
         self.image = self.water_animation[stadia - 1]
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def update(self, move, y_n):
         if self.name == 'water':

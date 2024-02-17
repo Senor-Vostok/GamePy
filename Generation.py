@@ -1,7 +1,7 @@
 import random
 
 
-class Generation():
+class Generation:
     def __init__(self, bioms, massive):
         self.bioms = bioms
         self.procent = list()
@@ -22,21 +22,24 @@ class Generation():
         self.procent[0][0] = 10
         self.masbiom[0][0] = random.choice(self.bioms)
 
-    def smoof_generation(self, count = 0, fl1=True, fl2=True, fl3=True):
+    def smoof_generation(self, count=0, fl1=True, fl2=True, fl3=True):
         for i in range(1, len(self.masbiom) - 1):
             for j in range(1, len(self.masbiom[i]) - 1):
-                self.masbiom[i][j] = random.choice([self.masbiom[i - 1][j], self.masbiom[i + 1][j], self.masbiom[i][j + 1], self.masbiom[i][j - 1]])
+                self.masbiom[i][j] = random.choice(
+                    [self.masbiom[i - 1][j], self.masbiom[i + 1][j], self.masbiom[i][j + 1], self.masbiom[i][j - 1]])
         for i in range(1, len(self.masbiom) - 1):
             for j in range(1, len(self.masbiom[i]) - 1):
                 spis = [self.masbiom[i - 1][j], self.masbiom[i][j - 1], self.masbiom[i + 1][j], self.masbiom[i][j + 1]]
-                if self.masbiom[i - 1][j] == self.masbiom[i][j - 1] and self.masbiom[i + 1][j] == self.masbiom[i][j + 1] and self.masbiom[i + 1][j] == self.masbiom[i - 1][j] and fl1:
+                if self.masbiom[i - 1][j] == self.masbiom[i][j - 1] and self.masbiom[i + 1][j] == self.masbiom[i][
+                    j + 1] and self.masbiom[i + 1][j] == self.masbiom[i - 1][j] and fl1:
                     self.masbiom[i][j] = self.masbiom[i][j - 1]
-                elif self.masbiom[i][j] not in [self.masbiom[i - 1][j], self.masbiom[i][j - 1], self.masbiom[i + 1][j], self.masbiom[i][j + 1]] and fl2:
+                elif self.masbiom[i][j] not in [self.masbiom[i - 1][j], self.masbiom[i][j - 1], self.masbiom[i + 1][j],
+                                                self.masbiom[i][j + 1]] and fl2:
                     self.masbiom[i][j] = random.choice(spis)
                 elif spis.count(max(spis)) > spis.count(min(spis)) and fl3:
-                        self.masbiom[i][j] = max(spis)
+                    self.masbiom[i][j] = max(spis)
                 elif spis.count(max(spis)) < spis.count(min(spis)) and fl3:
-                        self.masbiom[i][j] = min(spis)
+                    self.masbiom[i][j] = min(spis)
         if count == 0:
             return self.masbiom
         return self.smoof_generation(count - 1, fl1, fl2, fl3)
@@ -83,8 +86,8 @@ class Generation():
         for i in range(1, len(self.masbiom) - 1):
             for j in range(1, len(self.masbiom[i]) - 1):
                 close = [self.masbiom[i - 1][j - 1], self.masbiom[i - 1][j], self.masbiom[i - 1][j + 1],
-                         self.masbiom[i][j - 1], self.masbiom[i][j + 1],
-                         self.masbiom[i + 1][j - 1], self.masbiom[i + 1][j], self.masbiom[i + 1][j + 1]]
+                         self.masbiom[i][j - 1], self.masbiom[i][j + 1], self.masbiom[i + 1][j - 1],
+                         self.masbiom[i + 1][j], self.masbiom[i + 1][j + 1]]
                 if 'water' in close and self.masbiom[i][j] != 'water' and random.randint(1, 10):
                     self.masbiom[i][j] = 'sand'
 
@@ -118,7 +121,7 @@ class Generation():
                         self.masbiom[i][j] = self.masbiom[i][j - 1] if res else random.choice(self.bioms)
                     else:
                         self.masbiom[i][j] = self.masbiom[i - 1][j] if res else random.choice(self.bioms)
-                    self.procent[i][j] = max(random.randint(self.procent[i][j - 1] - pr, 10), random.randint(self.procent[i - 1][j] - pr, 10)) if res else 10
+                    self.procent[i][j] = max(random.randint(self.procent[i][j - 1] - pr, 10),
+                                             random.randint(self.procent[i - 1][j] - pr, 10)) if res else 10
 
         return self.masbiom
-

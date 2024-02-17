@@ -2,6 +2,7 @@ import pygame
 from Tree_class import Tree
 from Ground_class import Ground
 from Characters import MCharacter
+import Interface
 
 
 class World:
@@ -40,6 +41,8 @@ class World:
         self.world_cord = cord
 
         self.character = pygame.sprite.Group(MCharacter((self.centre[0], self.centre[1] - 60)))
+
+        self.interface = Interface.Interface(self.centre).gethotbar()
 
     def move_scene(self):
         if max(self.now_dr[0], self.start_dr[0]) - min(self.now_dr[0], self.start_dr[0]) > self.gr_main:
@@ -121,6 +124,7 @@ class World:
                     coord = obj.get_cord()
                     if coord[1] + 100 <= self.centre[1] and coord[0] in range(self.centre[0] - 90, self.centre[0] + 90):
                         self.character.draw(self.win)
+        self.interface.draw(self.win)
         #pygame.draw.rect(self.win, (255, 0, 0), (
         #self.global_centre[0] - self.move_barrier[0], self.global_centre[1] - self.move_barrier[1],
         #self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
