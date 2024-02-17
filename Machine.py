@@ -109,7 +109,7 @@ class World:
             self.move_scene()
             self.now_dr[0] += move[0]
             self.now_dr[1] += move[1]
-        if not flag:
+        if not flag and not flag2:
             self.character.update(way, [0, 0])
         if flag and not flag2:
             self.character.update(way, move)
