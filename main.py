@@ -18,7 +18,7 @@ win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre
 pygame.display.update()
 speed = 288 // fps
 
-sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone')]
+sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(8)]
 
 gen = Generation(sp, 200)
 world_pos_x = 20
@@ -66,6 +66,8 @@ while True:
             flag = False
             if i.key == pygame.K_F1:
                 speed = speed * 2
+            if i.key == pygame.K_F2:
+                speed = speed // 2
             if i.key == pygame.K_w:
                 move[1] = speed
             if i.key == pygame.K_s:
@@ -80,8 +82,11 @@ while True:
             if i.key == pygame.K_a or i.key == pygame.K_d:
                 move[0] = 0
         elif i.type == pygame.MOUSEBUTTONDOWN:
-            flag = world.check_select(i.pos[0], i.pos[1])
+            flag = world.select((i.pos[0], i.pos[1]))
         elif i.type == pygame.MOUSEBUTTONUP:
-            flag = world.check_select(i.pos[0], i.pos[1])
+            flag = world.select((i.pos[0], i.pos[1]))
+        if flag == 'quit':
+            exit()
     world.draw(move, action())
     pygame.display.update()
+aaaa

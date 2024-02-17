@@ -54,6 +54,16 @@ class Generation:
             new_world.append(prom)
         return new_world
 
+    def add_on_world(self, klak, llack, chance, instx, insty, name):
+        if random.randint(0, chance) == 1:
+            random_x = random.randint(70, 130)
+            random_y = random.randint(30, 150)
+            klak.append([(instx + random_x, insty + random_y), name, random.randint(0, 1)])
+            llack.append([(instx - 50 + random_x, insty - 200 + random_y), name])
+        else:
+            klak.append([(0, 0), 'None'])
+            llack.append([(0, 0), 'None'])
+
     def xy_objects(self):
         for i in range(len(self.masbiom)):
             prom = list()
@@ -65,14 +75,9 @@ class Generation:
                 klak = list()
                 llack = list()
                 if this_biom == 'forest':
-                    if random.randint(0, 3) == 1:
-                        random_x = random.randint(70, 130)
-                        random_y = random.randint(30, 150)
-                        klak.append([(instx + random_x, insty + random_y), 'tree', random.randint(0, 1)])
-                        llack.append([(instx - 50 + random_x, insty - 200 + random_y), 'tree'])
-                    else:
-                        klak.append([(0, 0), 'None'])
-                        llack.append([(0, 0), 'None'])
+                    self.add_on_world(klak, llack, 3, instx, insty, 'tree')
+                elif this_biom == 'stone':
+                    self.add_on_world(klak, llack, 8, instx, insty, 'stone')
                 else:
                     klak.append([(0, 0), 'None'])
                     llack.append([(0, 0), 'None'])

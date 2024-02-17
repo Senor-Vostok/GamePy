@@ -1,5 +1,4 @@
 import random
-
 import pygame
 
 
@@ -24,15 +23,7 @@ class Tree(pygame.sprite.Sprite):
         return self.colision
 
     def get_cord(self):
-        return self.rect.x + 90, self.rect.y + 140
-
-    def select(self):
-        if not self.sel:
-            self.image = pygame.image.load('data/objects/tree_select.png').convert_alpha()
-            self.sel = True
-        else:
-            self.image = pygame.image.load('data/objects/tree.png').convert_alpha()
-            self.sel = False
+        return self.rect.x + 90, self.rect.y + 240
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))

@@ -1,5 +1,6 @@
 import pygame
 from Tree_class import Tree
+from Stone_class import Stone
 from Ground_class import Ground
 from Characters import MCharacter
 import Interface
@@ -73,7 +74,7 @@ class World:
                 if obj:
                     coord = obj.get_cord()
                     col = obj.iscolision()
-                    if coord[1] + 100 + move[1] in range(point[1] - col[1][0], point[1] + col[1][1]) and coord[0] + \
+                    if coord[1] + move[1] in range(point[1] - col[1][0], point[1] + col[1][1]) and coord[0] + \
                             move[0] in range(point[0] - col[0][0], point[0] + col[0][1]):
                         return False
 
@@ -122,7 +123,7 @@ class World:
                     obj.update(move, flag and flag2)
                     obj.draw(self.win)
                     coord = obj.get_cord()
-                    if coord[1] + 100 <= self.centre[1] and coord[0] in range(self.centre[0] - 90, self.centre[0] + 90):
+                    if coord[1] <= self.centre[1] and coord[0] in range(self.centre[0] - 90, self.centre[0] + 90):
                         self.character.draw(self.win)
         self.interface.draw(self.win)
         #pygame.draw.rect(self.win, (255, 0, 0), (
@@ -130,25 +131,10 @@ class World:
         #self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
         #self.check_barrier(move, self.centre)
 
-    def check_select(self, mouse_x, mouse_y):
-        flag = False
-        propusk = True
-        minus_x = self.world_cord[1] * self.gr_main - self.now_dr[0]
-        minus_y = self.world_cord[0] * self.gr_main - self.now_dr[1]
-        j = 0
-        for i in range(self.world_cord[0], self.world_cord[0] + self.sq):
-            for j in range(self.world_cord[1], self.world_cord[1] + self.sq):
-                if self.sel_obj[i][j][0][1] == 'tree':
-                    cx = self.sel_obj[i][j][0][0][0] - minus_x
-                    cy = self.sel_obj[i][j][0][0][1] - minus_y
-                    if mouse_x in range(cx, cx + 100) and mouse_y in range(cy, cy + 150):
-                        flag = True
-                        break
-            if flag:
-                propusk = False
-                self.trees_list[i - self.world_cord[0]][j - self.world_cord[1]].select()
-                break
-        return propusk
+    def select(self, there):
+        for obj_interface in self.interface:
+            if obj_interface.rect.colliderect(there[0], there[1], 1, 1):
+                return 'quit'
 
     def create_ground(self):
         self.great_world = pygame.sprite.Group()
@@ -164,6 +150,12 @@ class World:
                         self.now_dr[1] + i * self.gr_main + self.gr_main // 2), None)
                 self.great_world.add(sprite)
 
+    def add_object(self, j, i, obj, first_block):
+        if obj[1] == 'tree':
+            self.trees_list[j][i] = Tree(first_block, obj, self.tree_animation)
+        elif obj[1] == 'stone':
+            self.trees_list[j][i] = Stone(first_block, obj, self.tree_animation)
+
     def create_objects(self, stor='static'):
         first_block = [self.now_dr[0] - self.world_cord[1] * self.gr_main,
                        self.now_dr[1] - self.world_cord[0] * self.gr_main]
@@ -172,34 +164,29 @@ class World:
             self.trees_list.insert(0, [None for _ in range(self.sq)])
             for i in range(self.sq):
                 for obj in self.obj[self.world_cord[0]][self.world_cord[1] + i]:
-                    if obj[1] == 'tree':
-                        self.trees_list[0][i] = Tree(first_block, obj, self.tree_animation)
+                    self.add_object(0, i, obj, first_block)
         elif stor == 'down':
             self.trees_list = self.trees_list[1:]
             self.trees_list.insert(self.sq, [None for _ in range(self.sq)])
             for i in range(self.sq):
                 for obj in self.obj[self.world_cord[0] + self.sq - 1][self.world_cord[1] + i]:
-                    if obj[1] == 'tree':
-                        self.trees_list[self.sq - 1][i] = Tree(first_block, obj, self.tree_animation)
+                    self.add_object(self.sq - 1, i, obj, first_block)
         elif stor == 'left':
             for i in range(self.sq):
                 self.trees_list[i] = self.trees_list[i][:-1]
                 self.trees_list[i].insert(0, None)
             for i in range(self.sq):
                 for obj in self.obj[self.world_cord[0] + i][self.world_cord[1]]:
-                    if obj[1] == 'tree':
-                        self.trees_list[i][0] = Tree(first_block, obj, self.tree_animation)
+                    self.add_object(i, 0, obj, first_block)
         elif stor == 'right':
             for i in range(self.sq):
                 self.trees_list[i] = self.trees_list[i][1:]
                 self.trees_list[i].insert(self.sq - 1, None)
             for i in range(self.sq):
                 for obj in self.obj[self.world_cord[0] + i][self.world_cord[1] + self.sq - 1]:
-                    if obj[1] == 'tree':
-                        self.trees_list[i][self.sq - 1] = Tree(first_block, obj, self.tree_animation)
+                    self.add_object(i, self.sq - 1, obj, first_block)
         else:
             for i in range(self.world_cord[0], self.world_cord[0] + self.sq):
                 for j in range(self.world_cord[1], self.world_cord[1] + self.sq):
                     for obj in self.obj[i][j]:
-                        if obj[1] == 'tree':
-                            self.trees_list[i - self.world_cord[0]][j - self.world_cord[1]] = Tree(first_block, obj, self.tree_animation)
+                        self.add_object(i - self.world_cord[0], j - self.world_cord[1], obj, first_block)
