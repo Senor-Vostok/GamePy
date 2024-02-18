@@ -6,7 +6,8 @@ class MCharacter(pygame.sprite.Sprite):  # поверить работу!
         pygame.sprite.Sprite.__init__(self)
         self.animation_left_move = [pygame.image.load(f'data/character/move/move_left{i}.png').convert_alpha() for i in range(1, 5)]
         self.animation_right_move = [pygame.image.load(f'data/character/move/move_right{i}.png').convert_alpha() for i in range(1, 5)]
-        self.animation_forward_move = [pygame.image.load(f'data/character/move/move_forward{i}.png').convert_alpha() for i in range(1, 5)]
+        self.animation_back_move = [pygame.image.load(f'data/character/move/move_forward{i}.png').convert_alpha() for i in range(1, 5)]
+        self.animation_forward_move = [pygame.image.load(f'data/character/move/move_back{i}.png').convert_alpha() for i in range(1, 5)]
         self.animation_stay = pygame.image.load('data/character/stay.png').convert_alpha()
         self.animation_stay_right = pygame.image.load('data/character/stay_right.png').convert_alpha()
         self.image = self.animation_stay
@@ -33,10 +34,13 @@ class MCharacter(pygame.sprite.Sprite):  # поверить работу!
             self.image = self.animation_right_move[stadia]
             self.action = action
         elif action == 'back':
+            self.image = self.animation_back_move[stadia]
+            self.action = action
+        elif action == 'forward':
             self.image = self.animation_forward_move[stadia]
             self.action = action
         else:
-            if self.action == 'right' or self.action == 'back':
+            if self.action == 'right' or self.action == 'forward':
                 self.image = self.animation_stay_right
             else:
                 self.image = self.animation_stay

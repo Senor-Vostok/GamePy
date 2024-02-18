@@ -2,18 +2,48 @@ import pygame
 
 
 class Stone(pygame.sprite.Sprite):
-    def __init__(self, first_block, obj, animation):
+    def __init__(self, first_block, obj, animation, image):
         pygame.sprite.Sprite.__init__(self)
         self.sel = False
-        self.image = pygame.image.load('data/objects/stone.png').convert_alpha()
+        self.image = image
         self.xoy = (first_block[0] + obj[0][0], first_block[1] + obj[0][1] - 20)
-        self.colision = [(80, 80), (40, 20)]  # относительное смещение по x и по y для проверки пересечения в точке
+        self.colision = [(90, 80), (10, 20)]  # относительное смещение по x и по y для проверки пересечения в точке
         self.rect = self.image.get_rect(center=self.xoy)
+
+        self.name = 'stone'
+        self.is_shake = False
+        self.shake_second = 0
+        self.shake_speed = 10
+        self.shake_temp = 1
 
         self.is_animated = False
         self.animation = animation
         self.second_animation = 0
         self.speed_animation = 30
+
+    def shake_start(self):
+        self.is_shake = True
+
+    def shake(self):
+        if self.is_shake:
+            self.shake_second += self.shake_temp
+            if self.shake_second == self.shake_speed:
+                self.shake_temp = -1
+                self.rect.x += 10
+            elif self.shake_second == -self.shake_speed:
+                self.shake_temp = 1
+                self.rect.x -= 20
+            elif self.shake_second == 0 and self.shake_temp == 1:
+                self.shake_temp = 1
+                self.rect.x += 10
+                self.is_shake = False
+
+    def press(self, there):
+        print('yes')
+        return self.rect.colliderect(there[0], there[1], 1, 1)
+
+    def myname(self):
+        return self.name
 
     def self_animation(self, stadia):
         self.image = self.animation[stadia - 1]
@@ -22,7 +52,7 @@ class Stone(pygame.sprite.Sprite):
         return self.colision
 
     def get_cord(self):
-        return self.rect.x + 90, self.rect.y + 120
+        return self.rect.x + 90, self.rect.y + 140
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))

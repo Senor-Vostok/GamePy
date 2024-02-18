@@ -87,7 +87,7 @@ while True:
         elif i.type == pygame.MOUSEBUTTONDOWN:
             flag = world.select((i.pos[0], i.pos[1]))
         elif i.type == pygame.MOUSEBUTTONUP:
-            flag = world.select((i.pos[0], i.pos[1]))
+            pass
     world.draw(move, action())
     true_fps = 1000000 // (datetime.now().microsecond - a)
     if speed != const_for_speed // true_fps and true_fps > 0:
