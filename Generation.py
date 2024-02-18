@@ -77,7 +77,7 @@ class Generation:
                 if this_biom == 'forest':
                     self.add_on_world(klak, llack, 4, instx, insty, 'tree')
                 elif this_biom == 'stone':
-                    self.add_on_world(klak, llack, 9, instx, insty, 'stone')
+                    self.add_on_world(klak, llack, 9, instx, insty, random.choice(['stone', 'stone', 'stone_pink']))
                 else:
                     klak.append([(0, 0), 'None'])
                     llack.append([(0, 0), 'None'])

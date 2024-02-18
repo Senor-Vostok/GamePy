@@ -4,6 +4,7 @@ from Stone_class import Stone
 from Ground_class import Ground
 from Characters import MCharacter
 from Effects import Effect
+from Resources import Resource
 import Interface
 
 
@@ -18,7 +19,10 @@ class World:
         self.water_animation = [pygame.image.load(f'data/animations/water_animations/wave{i}.png').convert_alpha() for i
                                 in range(1, 5)]
         self.tree_animation = [pygame.image.load(f'data/animations/tree_animations/shake{i}.png').convert_alpha() for i
-                               in range(1, 6)]
+                               in range(1, 8)]
+
+        # Resources
+        self.resources = {'wood': pygame.image.load('data/resources/wood.png').convert_alpha()}
 
         # Textures world
         self.land = {'flower': pygame.image.load('data/ground/grass.png').convert_alpha(),
@@ -27,7 +31,9 @@ class World:
                      'stone': pygame.image.load('data/ground/stone.png').convert_alpha(),
                      'sand': pygame.image.load('data/ground/sand.png').convert_alpha()}
         self.images = {'tree': pygame.image.load('data/objects/tree.png').convert_alpha(),
-                       'stone': pygame.image.load('data/objects/stone.png').convert_alpha()}
+                       'stone': pygame.image.load('data/objects/stone.png').convert_alpha(),
+                       'stone_pink': pygame.image.load('data/objects/stone_pink.png').convert_alpha(),
+                       'stone_white': pygame.image.load('data/objects/stone_white.png').convert_alpha()}
 
         self.obj = obj[0]
         self.sel_obj = obj[1]
@@ -50,11 +56,13 @@ class World:
 
         self.great_world = pygame.sprite.Group()
         self.land_object = [[None for _ in range(self.sq1)] for _ in range(self.sq2)]
+
+        self.resources_on_world = list()
         self.effects = list()
 
         self.world_cord = cord
 
-        self.character = pygame.sprite.Group(MCharacter((self.centre[0], self.centre[1] - 60)))
+        self.character = MCharacter((self.centre[0], self.centre[1] - 60))
 
         self.interface = Interface.Interface(self.centre).gethotbar()
 
@@ -102,17 +110,25 @@ class World:
                         return False
         return True
 
+    def show_object(self, sprites):
+        massive_sprites = list()
+        for sprite in sprites:
+            if sprite:
+                massive_sprites.append(sprite)
+        massive_sprites = sorted(massive_sprites, key=lambda x: x.get_cord()[1])
+        for obj in massive_sprites:
+            obj.draw(self.win)
+
     def draw(self, move=(0, 0), way='stay'):
         flag2 = False
 
-        for character in self.character:
-            if character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
-                                                              self.global_centre[0] + self.move_barrier[0]) or \
-                    character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
-                                                                   self.global_centre[1] + self.move_barrier[1]):
-                self.character.update(way, [0, 0])
-                flag2 = True
-            self.centre = character.get_cord()
+        if self.character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
+                                                            self.global_centre[0] + self.move_barrier[0]) or \
+                self.character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
+                                                                self.global_centre[1] + self.move_barrier[1]):
+            self.character.update(way, [0, 0])
+            flag2 = True
+        self.centre = self.character.get_cord()
 
         flag = self.check_barrier(move, self.centre)
 
@@ -133,24 +149,24 @@ class World:
         for d in deleted:
             self.effects.remove(d)
 
+        for res in self.resources_on_world:
+            res.update(move, flag and flag2)
+
         self.great_world.update(move, flag and flag2)
         self.great_world.draw(self.win)
-        self.character.draw(self.win)
+        list_object = list()
         for i in range(len(self.land_object)):
             for j in range(len(self.land_object[i])):
                 if self.land_object[i][j]:
                     if self.land_object[i][j].get_hp() == 0:
+                        self.resources_on_world.append(Resource(self.land_object[i][j].get_cord(), self.resources['wood']))
                         self.land_object[i][j] = None
                         self.obj[self.world_cord[0] + i][self.world_cord[1] + j] = [(0, 0), 'None']
                         continue
                     self.land_object[i][j].update(move, flag and flag2)
-                    self.land_object[i][j].draw(self.win)
-                    coord = self.land_object[i][j].get_cord()
-                    if coord[1] in range(self.centre[1] - 200, self.centre[1]) and coord[0] in range(self.centre[0] - 100, self.centre[0] + 200):
-                        self.character.draw(self.win)
-        for effect in self.effects:
-            effect.draw(self.win)
-        sprites = self.my_font.render(f'effects: {len(self.effects)}', False, (255 if len(self.effects) > 50 else 0, 255 if len(self.effects) <= 50 else 0, 0))
+                    list_object.append(self.land_object[i][j])
+        self.show_object([self.character] + self.effects + list_object + self.resources_on_world)
+        sprites = self.my_font.render(f'sprites: {len(self.effects) + len(self.resources_on_world) + len(list_object)}', False, (255 if len(self.effects) > 50 else 0, 255 if len(self.effects) <= 50 else 0, 0))
         self.interface.draw(self.win)
         self.win.blit(sprites, (20, 160))
         #pygame.draw.rect(self.win, (255, 0, 0), (
@@ -188,7 +204,7 @@ class World:
     def add_object(self, i, j, obj, first_block):
         if obj[1] == 'tree':
             self.land_object[i][j] = Tree(first_block, obj, self.tree_animation, self.images[obj[1]])
-        elif obj[1] == 'stone':
+        elif obj[1] == 'stone' or obj[1] == 'stone_pink' or obj[1] == 'stone_white':
             self.land_object[i][j] = Stone(first_block, obj, self.tree_animation, self.images[obj[1]])
 
     def create_objects(self, stor='static'):

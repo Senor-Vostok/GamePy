@@ -18,7 +18,7 @@ class Effect(pygame.sprite.Sprite):
         return self.mm
 
     def get_cord(self):
-        return self.rect
+        return self.rect[0], self.rect[1] + 280 * bool(self.mm)
 
     def draw(self, screen):
         screen.blit(self.image, (self.rect.x, self.rect.y))

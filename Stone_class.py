@@ -7,8 +7,9 @@ class Stone(pygame.sprite.Sprite):
         self.sel = False
         self.image = image
         self.xoy = (first_block[0] + obj[0][0], first_block[1] + obj[0][1] - 20)
-        self.colision = [(90, 80), (10, 20)]  # относительное смещение по x и по y для проверки пересечения в точке
+        self.colision = [(90, 80), (20, 25)]  # относительное смещение по x и по y для проверки пересечения в точке
         self.rect = self.image.get_rect(center=self.xoy)
+        self.hp = 10
 
         self.name = 'stone'
         self.is_shake = False
@@ -20,6 +21,9 @@ class Stone(pygame.sprite.Sprite):
         self.animation = animation
         self.second_animation = 0
         self.speed_animation = 30
+
+    def get_hp(self):
+        return self.hp
 
     def shake_start(self):
         self.is_shake = True
@@ -39,7 +43,6 @@ class Stone(pygame.sprite.Sprite):
                 self.is_shake = False
 
     def press(self, there):
-        print('yes')
         return self.rect.colliderect(there[0], there[1], 1, 1)
 
     def myname(self):

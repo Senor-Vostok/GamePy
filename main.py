@@ -21,7 +21,7 @@ normal_fps = 144
 speed = 3
 const_for_speed = normal_fps * speed
 
-sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(2)]
+sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(20)]
 
 gen = Generation(sp, 200)
 world_pos_x = 20

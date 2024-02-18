@@ -46,7 +46,10 @@ class MCharacter(pygame.sprite.Sprite):  # поверить работу!
                 self.image = self.animation_stay
 
     def get_cord(self):
-        return [self.rect.x + 45, self.rect.y + 190]
+        return self.rect.x + 45, self.rect.y + 190
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
 
     def update(self, action, move):
         self.animation(action)
