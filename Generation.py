@@ -109,7 +109,6 @@ class Generation:
     def generation(self):
         pr = 5
         for i in range(len(self.masbiom)):
-            prom = list()
             for j in range(len(self.masbiom[i])):
                 if i == 0 and j != 0:
                     res = self.procent[i][j - 1] > random.randint(1, 10)

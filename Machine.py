@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from Tree_class import Tree
 from Stone_class import Stone
@@ -64,7 +66,8 @@ class World:
 
         self.character = MCharacter((self.centre[0], self.centre[1] - 60))
 
-        self.interface = Interface.Interface(self.centre).gethotbar()
+        self.all_interface = Interface.Interface(self.centre)
+        self.interface = self.all_interface.gethotbar()
 
     def move_scene(self):
         if max(self.now_dr[0], self.start_dr[0]) - min(self.now_dr[0], self.start_dr[0]) > self.gr_main:
@@ -93,7 +96,7 @@ class World:
             for obj in self.land_object[i]:
                 if obj:
                     coord = obj.get_cord()
-                    col = obj.iscolision()
+                    col = obj.colision
                     if point[1] - move[1] in range(coord[1] - col[1][0], coord[1] + col[1][1]) and point[0] - \
                             move[0] in range(coord[0] - col[0][0], coord[0] + col[0][1]):
                         return False
@@ -118,6 +121,17 @@ class World:
         massive_sprites = sorted(massive_sprites, key=lambda x: x.get_cord()[1])
         for obj in massive_sprites:
             obj.draw(self.win)
+
+    def check_destroy_object(self, i, j):
+        if self.land_object[i][j].hp == 0:
+            coord = self.land_object[i][j].get_cord()
+            self.resources_on_world += [
+                Resource((coord[0], coord[1] + random.randint(-20, 20)), self.resources['wood'], 'wood') for _ in
+                range(random.randint(2, 4))]
+            self.land_object[i][j] = None
+            self.obj[self.world_cord[0] + i][self.world_cord[1] + j] = [(0, 0), 'None']
+            return True
+        return False
 
     def draw(self, move=(0, 0), way='stay'):
         flag2 = False
@@ -149,8 +163,14 @@ class World:
         for d in deleted:
             self.effects.remove(d)
 
+        deleted = list()
         for res in self.resources_on_world:
-            res.update(move, flag and flag2)
+            result = res.update(move, flag and flag2, self.centre, self.all_interface.where_is_take(res.name))
+            if result:
+                self.all_interface.where_is_take(res.name, True, res.image)
+                deleted.append(res)
+        for d in deleted:
+            self.resources_on_world.remove(d)
 
         self.great_world.update(move, flag and flag2)
         self.great_world.draw(self.win)
@@ -158,10 +178,7 @@ class World:
         for i in range(len(self.land_object)):
             for j in range(len(self.land_object[i])):
                 if self.land_object[i][j]:
-                    if self.land_object[i][j].get_hp() == 0:
-                        self.resources_on_world.append(Resource(self.land_object[i][j].get_cord(), self.resources['wood']))
-                        self.land_object[i][j] = None
-                        self.obj[self.world_cord[0] + i][self.world_cord[1] + j] = [(0, 0), 'None']
+                    if self.check_destroy_object(i, j):
                         continue
                     self.land_object[i][j].update(move, flag and flag2)
                     list_object.append(self.land_object[i][j])
@@ -182,8 +199,8 @@ class World:
             for obj in self.land_object[i]:
                 if obj and obj.get_cord()[0] in range(self.centre[0] - self.gr_main - self.gr_main // 2, self.centre[0] + self.gr_main) and \
                         obj.get_cord()[1] in range(self.centre[1] - self.gr_main - self.gr_main // 2, self.centre[1] + self.gr_main):
-                    if obj.press(there) and obj.myname() == 'tree':
-                        obj.shake_start()
+                    if obj.press(there):
+                        obj.is_shake = True
                         self.effects.append(Effect(there, self.effect_break_tree, True))
                         return
 

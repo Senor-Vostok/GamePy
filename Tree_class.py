@@ -14,6 +14,7 @@ class Tree(pygame.sprite.Sprite):
         self.hp = 10
 
         self.name = 'tree'
+
         self.is_shake = False
         self.shake_second = 0
         self.shake_speed = 10
@@ -23,12 +24,6 @@ class Tree(pygame.sprite.Sprite):
         self.animation = animation
         self.second_animation = 0
         self.speed_animation = 40
-
-    def get_hp(self):
-        return self.hp
-
-    def shake_start(self):
-        self.is_shake = True
 
     def shake(self):
         if self.is_shake:
@@ -48,14 +43,8 @@ class Tree(pygame.sprite.Sprite):
     def press(self, there):
         return self.rect.colliderect(there[0], there[1], 1, 1)
 
-    def myname(self):
-        return self.name
-
     def self_animation(self, stadia):
         self.image = self.animation[stadia - 1]
-
-    def iscolision(self):
-        return self.colision
 
     def get_cord(self):
         return self.rect.x + 90, self.rect.y + 320
