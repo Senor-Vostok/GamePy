@@ -20,7 +20,7 @@ class ClassicClass(pygame.sprite.Sprite):
 
         self.is_shake = False
         self.shake_second = 0
-        self.shake_speed = 10
+        self.shake_speed = 5
         self.shake_temp = 1
 
         self.is_animated = False
@@ -33,14 +33,14 @@ class ClassicClass(pygame.sprite.Sprite):
             self.shake_second += self.shake_temp
             if self.shake_second == self.shake_speed:
                 self.shake_temp = -1
-                self.rect.x += 10
+                self.rect.x += 8
             elif self.shake_second == -self.shake_speed:
                 self.shake_temp = 1
-                self.rect.x -= 20
+                self.rect.x -= 16
             elif self.shake_second == 0 and self.shake_temp == 1:
                 self.hp -= 1
                 self.shake_temp = 1
-                self.rect.x += 10
+                self.rect.x += 8
                 self.is_shake = False
 
     def press(self, there):
