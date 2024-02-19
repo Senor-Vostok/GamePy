@@ -1,8 +1,6 @@
 import random
-
 import pygame
-from Tree_class import Tree
-from Stone_class import Stone
+from Sprites_class import Tree, Stone
 from Ground_class import Ground
 from Characters import MCharacter
 from Effects import Effect
@@ -16,6 +14,9 @@ class World:
         # Effects
         self.effect_break_tree = [pygame.image.load(f'data/effects/tree_effects/break/break{i}.png').convert_alpha() for
                                   i in range(1, 8)]
+        self.effect_break_stone = [pygame.image.load(f'data/effects/stone_effects/break/break{i}.png').convert_alpha() for
+                                  i in range(1, 8)]
+        self.massive_destroy_effects = {'tree': self.effect_break_tree, 'stone': self.effect_break_stone}
 
         # Animations
         self.water_animation = [pygame.image.load(f'data/animations/water_animations/wave{i}.png').convert_alpha() for i
@@ -24,7 +25,10 @@ class World:
                                in range(1, 8)]
 
         # Resources
-        self.resources = {'wood': pygame.image.load('data/resources/wood.png').convert_alpha()}
+        self.resources = {'tree': pygame.image.load('data/resources/wood.png').convert_alpha(),
+                          'stone': pygame.image.load('data/resources/stone.png').convert_alpha()}
+        self.transcriptions = {'tree': 'wood',
+                               'stone': 'stone'}
 
         # Textures world
         self.land = {'flower': pygame.image.load('data/ground/grass.png').convert_alpha(),
@@ -126,26 +130,14 @@ class World:
         if self.land_object[i][j].hp == 0:
             coord = self.land_object[i][j].get_cord()
             self.resources_on_world += [
-                Resource((coord[0], coord[1] + random.randint(-20, 20)), self.resources['wood'], 'wood') for _ in
+                Resource((coord[0], coord[1] + random.randint(-20, 20)), self.resources[self.land_object[i][j].name], self.transcriptions[self.land_object[i][j].name]) for _ in
                 range(random.randint(2, 4))]
             self.land_object[i][j] = None
             self.obj[self.world_cord[0] + i][self.world_cord[1] + j] = [(0, 0), 'None']
             return True
         return False
 
-    def draw(self, move=(0, 0), way='stay'):
-        flag2 = False
-
-        if self.character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
-                                                            self.global_centre[0] + self.move_barrier[0]) or \
-                self.character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
-                                                                self.global_centre[1] + self.move_barrier[1]):
-            self.character.update(way, [0, 0])
-            flag2 = True
-        self.centre = self.character.get_cord()
-
-        flag = self.check_barrier(move, self.centre)
-
+    def update_object(self, move, way, flag, flag2):
         if flag2 and flag:
             self.move_scene()
             self.now_dr[0] += move[0]
@@ -172,6 +164,17 @@ class World:
         for d in deleted:
             self.resources_on_world.remove(d)
 
+    def draw(self, move=(0, 0), way='stay'):
+        flag2 = False
+        if self.character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
+                                                            self.global_centre[0] + self.move_barrier[0]) or \
+                self.character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
+                                                                self.global_centre[1] + self.move_barrier[1]):
+            self.character.update(way, [0, 0])
+            flag2 = True
+        self.centre = self.character.get_cord()
+        flag = self.check_barrier(move, self.centre)
+        self.update_object(move, way, flag, flag2)
         self.great_world.update(move, flag and flag2)
         self.great_world.draw(self.win)
         list_object = list()
@@ -193,7 +196,7 @@ class World:
 
     def select(self, there):
         for obj_interface in self.interface:
-            if obj_interface.rect.colliderect(there[0], there[1], 1, 1) and obj_interface.myname() == 'quit':
+            if obj_interface.rect.colliderect(there[0], there[1], 1, 1) and obj_interface.myname_is == 'quit':
                 return 'quit'
         for i in range(len(self.land_object) - 1, 0, -1):
             for obj in self.land_object[i]:
@@ -201,7 +204,7 @@ class World:
                         obj.get_cord()[1] in range(self.centre[1] - self.gr_main - self.gr_main // 2, self.centre[1] + self.gr_main):
                     if obj.press(there):
                         obj.is_shake = True
-                        self.effects.append(Effect(there, self.effect_break_tree, True))
+                        self.effects.append(Effect(there, self.massive_destroy_effects[obj.name], True))
                         return
 
     def create_ground(self):

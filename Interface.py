@@ -77,7 +77,7 @@ class Interface:
                         i.i_have = name
                         i.count += 1
                         self.interface.add(Image((i.rect[0] + 40, i.rect[1] + 40), image, 'resource'))
-                        self.interface.add(Text((i.rect[0] + 40, i.rect[1] + 70), self.font.render(f'{i.count}', False, (255, 255, 255)), i.myname_is[-1]))
+                        self.interface.add(Text((i.rect[0] + 40, i.rect[1] + 60), self.font.render(f'{i.count}', False, (255, 255, 255)), i.myname_is[-1]))
                     elif i.i_have and flag:
                         for text in self.interface:
                             if text.myname_is in i.myname_is and text.myname_is != i.myname_is:

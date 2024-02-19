@@ -21,7 +21,7 @@ normal_fps = 144
 speed = 3
 const_for_speed = normal_fps * speed
 
-sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(20)]
+sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(2)]
 
 gen = Generation(sp, 200)
 world_pos_x = 20
@@ -94,7 +94,7 @@ while True:
         speed = const_for_speed // true_fps
         if move[0]: move[0] = const_for_speed // true_fps * (abs(move[0]) // move[0])
         if move[1]: move[1] = const_for_speed // true_fps * (abs(move[1]) // move[1])
-    fpstxt = my_font.render(f'fps: {abs(true_fps)}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
+    fpstxt = my_font.render(f'fps: {true_fps}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
     speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
     win.blit(fpstxt, (20, 100))
     win.blit(speedtxt, (20, 130))
