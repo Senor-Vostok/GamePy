@@ -1,7 +1,6 @@
 import random
 from numpy import floor
 from perlin_noise import PerlinNoise
-import matplotlib.pyplot as plt
 
 
 class Generation:
