@@ -9,9 +9,10 @@ import Interface
 
 
 class World:
-    def __init__(self, win, centre, cord, bioms, obj, width):
+    def __init__(self, win, centre, cord, bioms, obj):
         self.my_font = pygame.font.SysFont('Futura book C', 30)
         # Effects
+        self.image_oreol = pygame.image.load('data/oreol.png').convert_alpha()
         self.effect_break_tree = [pygame.image.load(f'data/effects/tree_effects/break/break{i}.png').convert_alpha() for
                                   i in range(1, 8)]
         self.effect_break_stone = [pygame.image.load(f'data/effects/stone_effects/break/break{i}.png').convert_alpha() for
@@ -35,7 +36,10 @@ class World:
                      'forest': pygame.image.load('data/ground/forest.png').convert_alpha(),
                      'water': pygame.image.load('data/ground/water.png').convert_alpha(),
                      'stone': pygame.image.load('data/ground/stone.png').convert_alpha(),
-                     'sand': pygame.image.load('data/ground/sand.png').convert_alpha()}
+                     'sand': pygame.image.load('data/ground/sand.png').convert_alpha(),
+                     'snow': pygame.image.load('data/ground/snow.png').convert_alpha(),
+                     'barrier': pygame.image.load('data/ground/barrier.png').convert_alpha(),
+                     'grass_sand': pygame.image.load('data/ground/grass_sand.png').convert_alpha()}
         self.images = {'tree': pygame.image.load('data/objects/tree.png').convert_alpha(),
                        'stone': pygame.image.load('data/objects/stone.png').convert_alpha(),
                        'stone_pink': pygame.image.load('data/objects/stone_pink.png').convert_alpha(),
@@ -113,7 +117,7 @@ class World:
                 pygame.draw.rect(self.win, (0, 0, 255), (
                 self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
                 if res:
-                    if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
+                    if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water' or self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'barrier':
                         return False
         return True
 
@@ -167,9 +171,9 @@ class World:
     def draw(self, move=(0, 0), way='stay'):
         flag2 = False
         if self.character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
-                                                            self.global_centre[0] + self.move_barrier[0]) or \
+                                                               self.global_centre[0] + self.move_barrier[0]) or \
                 self.character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
-                                                                self.global_centre[1] + self.move_barrier[1]):
+                                                                    self.global_centre[1] + self.move_barrier[1]):
             self.character.update(way, [0, 0])
             flag2 = True
         self.centre = self.character.get_cord()
@@ -189,15 +193,12 @@ class World:
         sprites = self.my_font.render(f'sprites: {len(self.effects) + len(self.resources_on_world) + len(list_object)}', False, (255 if len(self.effects) > 50 else 0, 255 if len(self.effects) <= 50 else 0, 0))
         self.interface.draw(self.win)
         self.win.blit(sprites, (20, 160))
-        #pygame.draw.rect(self.win, (255, 0, 0), (
-        #self.global_centre[0] - self.move_barrier[0], self.global_centre[1] - self.move_barrier[1],
-        #self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
-        #self.check_barrier(move, self.centre)
 
     def select(self, there):
         for obj_interface in self.interface:
-            if obj_interface.rect.colliderect(there[0], there[1], 1, 1) and obj_interface.myname_is == 'quit':
-                return 'quit'
+            if obj_interface.rect.colliderect(there[0], there[1], 1, 1):
+                obj_interface.do_some()
+                return obj_interface.myname_is
         for i in range(len(self.land_object) - 1, 0, -1):
             for obj in self.land_object[i]:
                 if obj and obj.get_cord()[0] in range(self.centre[0] - self.gr_main - self.gr_main // 2, self.centre[0] + self.gr_main) and \

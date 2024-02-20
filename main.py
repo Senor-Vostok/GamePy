@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from datetime import datetime
 from Machine import World
@@ -21,20 +23,15 @@ normal_fps = 144
 speed = 3
 const_for_speed = normal_fps * speed
 
-sp = [('flower') for _ in range(4)] + [('forest') for _ in range(20)] + [('water') for _ in range(1)] + [('stone') for _ in range(2)]
-
-gen = Generation(sp, 200)
-world_pos_x = 20
-world_pos_y = 20
+size_world = 200
+gen = Generation(size_world)
+world_pos_x = random.randint(0, size_world)
+world_pos_y = random.randint(0, size_world)
 gen.generation()
-gen.smoof_generation()
-gen.smoof_generation(0, False, True, False)
 matr_worls = gen.add_barier(15)
-gen.smoof_generation(10)
-gen.weathering()
 
 obj = gen.xy_objects()
-world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj, width)
+world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj)
 world.create_ground()
 world.create_objects()
 

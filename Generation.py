@@ -1,9 +1,12 @@
 import random
+from numpy import floor
+from perlin_noise import PerlinNoise
+import matplotlib.pyplot as plt
 
 
 class Generation:
-    def __init__(self, bioms, massive):
-        self.bioms = bioms
+    def __init__(self, massive):
+        self.translate = {0: 'water', 1: 'sand', 2: 'flower', 3: 'forest', 4: 'stone', 5: 'snow'}
         self.procent = list()
         self.masbiom = list()
         self.masive = massive
@@ -19,40 +22,6 @@ class Generation:
             for j in range(massive):
                 prom.append(0)
             self.masbiom.append(prom)
-        self.procent[0][0] = 10
-        self.masbiom[0][0] = random.choice(self.bioms)
-
-    def smoof_generation(self, count=0, fl1=True, fl2=True, fl3=True):
-        for i in range(1, len(self.masbiom) - 1):
-            for j in range(1, len(self.masbiom[i]) - 1):
-                self.masbiom[i][j] = random.choice(
-                    [self.masbiom[i - 1][j], self.masbiom[i + 1][j], self.masbiom[i][j + 1], self.masbiom[i][j - 1]])
-        for i in range(1, len(self.masbiom) - 1):
-            for j in range(1, len(self.masbiom[i]) - 1):
-                spis = [self.masbiom[i - 1][j], self.masbiom[i][j - 1], self.masbiom[i + 1][j], self.masbiom[i][j + 1]]
-                if self.masbiom[i - 1][j] == self.masbiom[i][j - 1] and self.masbiom[i + 1][j] == self.masbiom[i][
-                    j + 1] and self.masbiom[i + 1][j] == self.masbiom[i - 1][j] and fl1:
-                    self.masbiom[i][j] = self.masbiom[i][j - 1]
-                elif self.masbiom[i][j] not in [self.masbiom[i - 1][j], self.masbiom[i][j - 1], self.masbiom[i + 1][j],
-                                                self.masbiom[i][j + 1]] and fl2:
-                    self.masbiom[i][j] = random.choice(spis)
-                elif spis.count(max(spis)) > spis.count(min(spis)) and fl3:
-                    self.masbiom[i][j] = max(spis)
-                elif spis.count(max(spis)) < spis.count(min(spis)) and fl3:
-                    self.masbiom[i][j] = min(spis)
-        if count == 0:
-            return self.masbiom
-        return self.smoof_generation(count - 1, fl1, fl2, fl3)
-
-    def reversive_world(self):
-        new_world = list()
-        print(len(self.masbiom[0]), len(self.masbiom))
-        for i in range(len(self.masbiom[0])):
-            prom = list()
-            for j in range(len(self.masbiom)):
-                prom.append(self.masbiom[j][i])
-            new_world.append(prom)
-        return new_world
 
     def add_on_world(self, klak, llack, chance, instx, insty, name):
         if random.randint(1, chance) == 1:
@@ -106,26 +75,36 @@ class Generation:
                 self.masbiom[i] = ['water'] * size + self.masbiom[i] + ['water'] * size
         return self.masbiom
 
+    def get_key(self, z):
+        if z < -6:
+            return 0
+        elif z in range(-6, -5):
+            return 1
+        elif z in range(-5, -4):
+            return 2
+        elif z in range(-4, 2):
+            return 3
+        elif z in range(1, 7):
+            return 4
+        else:
+            return 5
+
     def generation(self):
-        pr = 5
-        for i in range(len(self.masbiom)):
-            for j in range(len(self.masbiom[i])):
-                if i == 0 and j != 0:
-                    res = self.procent[i][j - 1] > random.randint(1, 10)
-                    self.masbiom[i][j] = self.masbiom[i][j - 1] if res else random.choice(self.bioms)
-                    self.procent[i][j] = random.randint(self.procent[i][j - 1] - pr, 10) if res else 10
-                elif j == 0 and i != 0:
-                    res = self.procent[i - 1][j] > random.randint(1, 10)
-                    self.masbiom[i][j] = self.masbiom[i - 1][j] if res else random.choice(self.bioms)
-                    self.procent[i][j] = random.randint(self.procent[i - 1][j] - pr, 10) if res else 10
-                elif i != 0 and j != 0:
-                    up_left = True if self.procent[i][j - 1] > self.procent[i - 1][j] else False
-                    res = max(self.procent[i][j - 1], self.procent[i - 1][j]) > random.randint(1, 10)
-                    if not up_left:
-                        self.masbiom[i][j] = self.masbiom[i][j - 1] if res else random.choice(self.bioms)
-                    else:
-                        self.masbiom[i][j] = self.masbiom[i - 1][j] if res else random.choice(self.bioms)
-                    self.procent[i][j] = max(random.randint(self.procent[i][j - 1] - pr, 10),
-                                             random.randint(self.procent[i - 1][j] - pr, 10)) if res else 10
+        seed = random.randint(1000, 9000)
+        noise = PerlinNoise(octaves=7, seed=seed)
+        amp = 14
+        period = 100
+        landscale = [[0 for _ in range(self.masive)] for _ in range(self.masive)]
+        for position in range(self.masive ** 2):
+            x = floor(position / self.masive)
+            z = floor(position % self.masive)
+            y = floor(noise([x / period, z / period]) * amp)
+            landscale[int(x)][int(z)] = self.get_key(int(y))
+        for i in range(self.masive):
+            for j in range(self.masive):
+                self.masbiom[i][j] = self.translate[landscale[i][j]]
+
+        plt.imshow(landscale)
+        plt.show()
 
         return self.masbiom
