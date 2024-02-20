@@ -104,7 +104,4 @@ class Generation:
             for j in range(self.masive):
                 self.masbiom[i][j] = self.translate[landscale[i][j]]
 
-        plt.imshow(landscale)
-        plt.show()
-
         return self.masbiom
