@@ -3,7 +3,7 @@ import pygame
 
 
 class Resource(pygame.sprite.Sprite):
-    def __init__(self, xoy, image, name):
+    def __init__(self, xoy, image, name, flag=True):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.name = name
@@ -14,10 +14,10 @@ class Resource(pygame.sprite.Sprite):
         self.drop_speed = 4
         self.drop_move = 20
         self.drop_delta = 1
-        self.animation = True
+        self.animation = flag
 
         self.take_cake = 20
-        self.taked = False
+        self.takes = False
         self.deviation = random.randint(-10, 11)
 
     def take(self, move):
@@ -53,8 +53,8 @@ class Resource(pygame.sprite.Sprite):
     def update(self, move, y_n, character_cord, move_there=None):
         res = False
         self.drop_animation()
-        if move_there and (self.rect.colliderect(character_cord[0], character_cord[1], 1, 1) or self.taked):
-            self.taked = True
+        if move_there and (self.rect.colliderect(character_cord[0], character_cord[1], 1, 1) or self.takes):
+            self.takes = True
             res = self.take(move_there)
         if y_n:
             self.rect.y += move[1]

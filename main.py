@@ -25,19 +25,18 @@ const_for_speed = normal_fps * speed
 
 size_world = 200
 gen = Generation(size_world)
-world_pos_x = random.randint(0, size_world)
-world_pos_y = random.randint(0, size_world)
+world_pos_x = 20
+world_pos_y = 20
 gen.generation()
 matr_worls = gen.add_barier(15)
-
 obj = gen.xy_objects()
 world = World(win, centre, [world_pos_x, world_pos_y], matr_worls, obj)
-world.create_ground()
-world.create_objects()
+world.create()
 
 count_x = 0
 count_y = 0
 flag = False
+open_crafter = False
 
 move = [0, 0]
 
@@ -59,6 +58,7 @@ def action():
 
 while True:
     a = datetime.now().microsecond
+    clock.tick(200)
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             sys.exit()
@@ -76,16 +76,20 @@ while True:
                 move[0] = speed
             if i.key == pygame.K_d:
                 move[0] = -speed
+            if i.key == pygame.K_e:
+                open_crafter = True if not open_crafter else False
         elif i.type == pygame.KEYUP:
             if i.key == pygame.K_w or i.key == pygame.K_s:
                 move[1] = 0
             if i.key == pygame.K_a or i.key == pygame.K_d:
                 move[0] = 0
         elif i.type == pygame.MOUSEBUTTONDOWN:
-            flag = world.select((i.pos[0], i.pos[1]))
+            flag = world.select((i.pos[0], i.pos[1]), True)
         elif i.type == pygame.MOUSEBUTTONUP:
             pass
-    world.draw(move, action())
+        elif i.type == pygame.MOUSEMOTION:
+            world.select((i.pos[0], i.pos[1]))
+    world.draw(move, action(), open_crafter)
     true_fps = 1000000 // (datetime.now().microsecond - a)
     if speed != const_for_speed // true_fps and true_fps > 0:
         speed = const_for_speed // true_fps
@@ -95,7 +99,6 @@ while True:
     speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
     win.blit(fpstxt, (20, 100))
     win.blit(speedtxt, (20, 130))
-
     pygame.display.update()
     if flag == 'quit':
         pygame.display.quit()

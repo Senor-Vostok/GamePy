@@ -1,6 +1,7 @@
 import random
 from numpy import floor
 from perlin_noise import PerlinNoise
+import matplotlib.pyplot as plt
 
 
 class Generation:
@@ -102,5 +103,4 @@ class Generation:
         for i in range(self.masive):
             for j in range(self.masive):
                 self.masbiom[i][j] = self.translate[landscale[i][j]]
-
         return self.masbiom
