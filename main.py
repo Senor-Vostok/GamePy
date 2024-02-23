@@ -1,5 +1,3 @@
-import random
-
 import pygame
 from datetime import datetime
 from Machine import World
@@ -19,9 +17,9 @@ clock = pygame.time.Clock()
 win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
 
 pygame.display.update()
-normal_fps = 144
-speed = 3
-const_for_speed = normal_fps * speed
+normal_fps = 60
+speed = 6
+const_for_speed = normal_fps * speed  # не использовать 300!!!!
 
 size_world = 200
 gen = Generation(size_world)
@@ -56,9 +54,12 @@ def action():
         return 'stay'
 
 
+start = datetime.now().microsecond
+fpstxt = my_font.render(f'fps: {normal_fps}', False, (255 if normal_fps < 100 else 0, 255 if normal_fps >= 100 else 0, 0))
+speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
+
 while True:
     a = datetime.now().microsecond
-    clock.tick(200)
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
             sys.exit()
@@ -92,11 +93,14 @@ while True:
     world.draw(move, action(), open_crafter)
     true_fps = 1000000 // (datetime.now().microsecond - a)
     if speed != const_for_speed // true_fps and true_fps > 0:
-        speed = const_for_speed // true_fps
-        if move[0]: move[0] = const_for_speed // true_fps * (abs(move[0]) // move[0])
-        if move[1]: move[1] = const_for_speed // true_fps * (abs(move[1]) // move[1])
-    fpstxt = my_font.render(f'fps: {true_fps}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
-    speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
+        speed = const_for_speed / true_fps if const_for_speed / true_fps != 1.5 else speed
+        if move[0]: move[0] = speed * (abs(move[0]) // move[0])
+        if move[1]: move[1] = speed * (abs(move[1]) // move[1])
+    end = datetime.now().microsecond
+    if abs(end - start) >= 500000 and true_fps > 0:
+        fpstxt = my_font.render(f'fps: {true_fps}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
+        speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
+        start = datetime.now().microsecond
     win.blit(fpstxt, (20, 100))
     win.blit(speedtxt, (20, 130))
     pygame.display.update()

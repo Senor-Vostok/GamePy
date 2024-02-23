@@ -1,4 +1,3 @@
-import copy
 import random
 import pygame
 from Sprites_class import Tree, Stone
@@ -108,20 +107,18 @@ class World:
                         self.add_object(i - self.world_cord[0], j - self.world_cord[1], obj, first_block)
 
     def draw(self, move=(0, 0), way='stay', open_some=False):
-        flag2 = False
-        if self.character.get_cord()[0] - move[0] not in range(self.global_centre[0] - self.move_barrier[0],
-                                                               self.global_centre[0] + self.move_barrier[0]) or \
-                self.character.get_cord()[1] - move[1] not in range(self.global_centre[1] - self.move_barrier[1],
-                                                                    self.global_centre[1] + self.move_barrier[1]):
-            flag2 = True
+        flag2 = True
+        if self.global_centre[0] - self.move_barrier[0] < self.character.get_cord()[0] - move[0] < self.global_centre[0] + self.move_barrier[0] and \
+                self.global_centre[1] - self.move_barrier[1] < self.character.get_cord()[1] - move[1] < self.global_centre[1] + self.move_barrier[1]:
+            flag2 = False
         self.centre = self.character.get_cord()
         flag = self.check_barrier(move, self.centre)
-        self.update_object(move, way, flag, flag2, open_some)
         sorted_by_priority = list()
         for i in range(len(self.great_world)):
             for j in range(len(self.great_world[i])):
                 self.great_world[i][j].update(self.synchronous, move, flag and flag2 and not open_some)
                 sorted_by_priority.append(self.great_world[i][j])
+        self.update_object(move, way, flag, flag2, open_some)
         for i in sorted(sorted_by_priority, key=lambda x: self.priority.index(x.name)):
             i.draw(self.win)
         self.synchronous = self.synchronous + 1 if self.synchronous < 1000000 else 0
@@ -138,7 +135,9 @@ class World:
         self.interface.interface.draw(self.win)
         if open_some:
             self.interface.show_craftbook(self.win, self.crafts[self.craft_number])
+        #self.check_barrier(move, self.centre)
         self.win.blit(sprites, (20, 160))
+        #pygame.draw.rect(self.win, (255, 0, 0), (self.global_centre[0] - self.move_barrier[0], self.global_centre[1] - self.move_barrier[1], self.move_barrier[0] * 2, self.move_barrier[1] * 2), 5)
 
     def import_textures(self):
         self.my_font = pygame.font.SysFont('Futura book C', 30)
@@ -203,17 +202,13 @@ class World:
                 if obj:
                     coord = obj.get_cord()
                     col = obj.colision
-                    if point[1] - move[1] in range(coord[1] - col[1][0], coord[1] + col[1][1]) and point[0] - \
-                            move[0] in range(coord[0] - col[0][0], coord[0] + col[0][1]):
+                    if coord[1] - col[1][0] < point[1] - move[1] < coord[1] + col[1][1] and coord[0] - col[0][0] < point[0] - move[0] < coord[0] + col[0][1]:
                         return False
 
             for j in range(self.sq1 // 2 - 1, self.sq1 // 2 + 2):
-                res = point[0] - move[0] in range(self.now_dr[0] + j * self.gr_main,
-                                                  self.now_dr[0] + j * self.gr_main + self.gr_main) and \
-                      point[1] - move[1] in range(self.now_dr[1] + i * self.gr_main,
-                                                  self.now_dr[1] + i * self.gr_main + self.gr_main)
-                pygame.draw.rect(self.win, (0, 0, 255), (
-                self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
+                res = self.now_dr[0] + j * self.gr_main < point[0] - move[0] < self.now_dr[0] + j * self.gr_main + self.gr_main and \
+                      self.now_dr[1] + i * self.gr_main < point[1] - move[1] < self.now_dr[1] + i * self.gr_main + self.gr_main
+                pygame.draw.rect(self.win, (0, 0, 255), (self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
                 if res:
                     if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
                         return False
@@ -239,10 +234,10 @@ class World:
         return False
 
     def update_object(self, move, way, flag, flag2, open_some):
-        if flag2 and flag and not open_some:
+        if flag and flag2 and not open_some:
+            self.now_dr[0] = self.great_world[0][0].rect[0] + 10
+            self.now_dr[1] = self.great_world[0][0].rect[1] + 10
             self.move_scene()
-            self.now_dr[0] += move[0]
-            self.now_dr[1] += move[1]
         if flag and not flag2 and not open_some:
             self.character.update(way, move)
         else:

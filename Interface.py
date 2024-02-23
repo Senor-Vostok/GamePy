@@ -21,6 +21,19 @@ class Classic(pygame.sprite.Sprite):
         self.rect.y += move[1]
 
 
+class ClassicBar(Classic):
+    def __init__(self, xoy, image, name):
+        pygame.sprite.Sprite.__init__(self)
+        self.name = str(name)
+        self.image = image
+        self.rect = self.image.get_rect(center=xoy)
+        self.rect_cr = (self.rect[0] + 50, self.rect[1] + 50)
+        self.image_resource = None
+        self.text = None
+        self.i_have = None
+        self.count_have = 0
+
+
 class Hotbar(Classic):
     def __init__(self, xoy, image, name):
         pygame.sprite.Sprite.__init__(self)
@@ -34,7 +47,7 @@ class Hotbar(Classic):
         self.text = None
 
 
-class Buttoncraft(Classic):
+class Buttoncraft(ClassicBar):
     def __init__(self, xoy, image, name, active_passive):
         pygame.sprite.Sprite.__init__(self)
         self.name = str(name)
@@ -42,7 +55,10 @@ class Buttoncraft(Classic):
         self.rect = self.image.get_rect(center=xoy)
         self.rect_cr = (self.rect[0] + 50, self.rect[1] + 50)
         self.images = active_passive
-
+        self.image_resource = None
+        self.text = None
+        self.i_have = None
+        self.count_have = 0
     def do_some(self, change=False):
         if change:
             self.image = self.images[0]
@@ -56,13 +72,11 @@ class Interface:
         self.inventory = inventory
         self.image_hotbar = pygame.image.load('data/Interface/hotbar.png').convert_alpha()
         self.image_quit = pygame.image.load('data/Interface/quit.png').convert_alpha()
-
         self.image_crafter = pygame.image.load('data/Interface/crafter.png').convert_alpha()
         self.crafter_close = pygame.image.load('data/Interface/bar_crafter-close.png').convert_alpha()
         self.crafter_open = pygame.image.load('data/Interface/bar_crafter-open.png').convert_alpha()
         self.get_crafte = pygame.image.load('data/Interface/get_craft.png').convert_alpha()
         self.get_crafta = pygame.image.load('data/Interface/get_craft-active.png').convert_alpha()
-
         self.font = pygame.font.SysFont('Futura book C', 30)
         self.resources = image_resources
 
@@ -78,32 +92,46 @@ class Interface:
             self.interface.add(Hotbar((start + i * self.sizebar, self.size_window[1] * 2 - 50), self.image_hotbar, f'hotbar{i}'))
         self.interface.add(Classic((50, 50), self.image_quit, 'quit'))
 
-        self.craft_book.append(Classic((400, 540), self.image_crafter, 'crafter_label'))
+        self.craft_book.append(Classic((400, size_window[1]), self.image_crafter, 'crafter_label'))
         for i in range(7):
             if i == 0:
-                self.craft_book.append(Classic((400, 240 + i * 100), self.crafter_open, 'crafter_main'))
+                self.craft_book.append(ClassicBar((400, size_window[1] - 300 + i * 100), self.crafter_open, 'crafter_main'))
                 continue
             if i == 1:
-                self.craft_book.append(Buttoncraft((400, 240 + i * 100), self.get_crafte, 'button_craft', [self.get_crafta, self.get_crafte]))
+                self.craft_book.append(Buttoncraft((400, size_window[1] - 300 + i * 100), self.get_crafte, 'button_craft', [self.get_crafta, self.get_crafte]))
                 continue
-            self.craft_book.append(Classic((400, 240 + i * 100), self.crafter_close, 'crafter_component'))
+            self.craft_book.append(ClassicBar((400, size_window[1] - 300 + i * 100), self.crafter_close, f'crafter_component:{i - 2}'))
 
-    def update_craft(self, craft):
-        c = craft[0].split('_')
-        self.craft_book.append(Resource((self.craft_book[1].rect_cr[0], self.craft_book[1].rect_cr[1]), self.resources[c[0]], c[0], False))
-        self.craft_book.append(Classic((self.craft_book[1].rect_cr[0], self.craft_book[1].rect_cr[1] + 30), self.font.render(f'{c[1]}', False, (255, 255, 255)), 'count'))
-        if craft[1] == 'unlock':
-            self.craft_book[1].image = self.crafter_open
-        else:
-            self.craft_book[1].image = self.crafter_close
-        for i in range(len(craft[2])):
-            c = craft[2][i].split('_')
-            self.craft_book.append(Classic((self.craft_book[3 + i].rect_cr[0], self.craft_book[3 + i].rect_cr[1]), self.resources[c[0]], c[0]))
-            self.craft_book.append(Classic((self.craft_book[3 + i].rect_cr[0], self.craft_book[3 + i].rect_cr[1] + 30), self.font.render(f'{c[1]}', False, (255, 255, 255)), 'count'))
-            if c[0] in self.inventory and self.inventory[c[0]] >= int(c[1]):
-                self.craft_book[3 + i].image = self.crafter_open
-            else:
-                self.craft_book[3 + i].image = self.crafter_close
+    def update_craft(self, craft, update):
+        if update:
+            self.last_craft = craft[0]
+            self.craft_book = self.craft_book[:8]
+        for i in self.craft_book[1:8]:
+            if i.name == 'crafter_main' and update:
+                i.i_have = (craft[0].split('_'))[0]
+                print(i.i_have)
+                i.count_have = int((craft[0].split('_'))[1])
+                i.image_resource = Resource((self.craft_book[1].rect_cr[0], self.craft_book[1].rect_cr[1]), self.resources[i.i_have], i.i_have, False)
+                self.craft_book.append(i.image_resource)
+                if i.count_have > 1:
+                    i.text = Classic((i.rect_cr[0], i.rect_cr[1] + 30), self.font.render(f'{i.count_have}', False, (255, 255, 255)), 'count')
+                    self.craft_book.append(i.text)
+            elif 'crafter_component' in i.name:
+                if int((i.name.split(':'))[1]) < len(craft[2]):
+                    if update:
+                        i.i_have = (craft[2][int((i.name.split(':'))[1])].split('_'))[0]
+                        i.count_have = int((craft[2][int((i.name.split(':'))[1])].split('_'))[1])
+                        i.image_resource = Classic((i.rect_cr[0], i.rect_cr[1]), self.resources[i.i_have], i.i_have)
+                        i.text = Classic((i.rect_cr[0], i.rect_cr[1] + 30), self.font.render(f'{i.count_have}', False, (255, 255, 255)), 'count')
+                        self.craft_book.append(i.image_resource)
+                        self.craft_book.append(i.text)
+                    else:
+                        if i.i_have in self.inventory and i.count_have <= self.inventory[i.i_have]:
+                            i.image = self.crafter_open
+                        else:
+                            i.image = self.crafter_close
+                else:
+                    break
 
     def can_craft(self, craft):
         for i in craft[2]:
@@ -130,8 +158,7 @@ class Interface:
                         i.text.image = self.font.render(f'{i.count}', False, (255, 255, 255))
 
     def show_craftbook(self, surface, craft):
-        self.craft_book = self.craft_book[:8]
-        self.update_craft(craft)
+        self.update_craft(craft, craft[0] != self.last_craft)
         for i in self.craft_book:
             i.draw(surface)
 

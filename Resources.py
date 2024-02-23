@@ -11,8 +11,8 @@ class Resource(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=xoy)
 
         self.drop_second = 0
-        self.drop_speed = 4
-        self.drop_move = 20
+        self.drop_speed = 3
+        self.drop_move = 25
         self.drop_delta = 1
         self.animation = flag
 
