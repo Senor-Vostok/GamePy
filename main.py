@@ -23,8 +23,8 @@ const_for_speed = normal_fps * speed  # не использовать 300!!!!
 
 size_world = 200
 gen = Generation(size_world)
-world_pos_x = 20
-world_pos_y = 20
+world_pos_x = 10
+world_pos_y = 10
 gen.generation()
 matr_worls = gen.add_barier(15)
 obj = gen.xy_objects()
@@ -99,7 +99,7 @@ while True:
     end = datetime.now().microsecond
     if abs(end - start) >= 500000 and true_fps > 0:
         fpstxt = my_font.render(f'fps: {true_fps}', False, (255 if true_fps < 100 else 0, 255 if true_fps >= 100 else 0, 0))
-        speedtxt = my_font.render(f'speed: {speed}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
+        speedtxt = my_font.render(f'speed: {int(speed * 100)/100}', False, (255 if speed > 10 else 0, 255 if speed <= 10 else 0, 0))
         start = datetime.now().microsecond
     win.blit(fpstxt, (20, 100))
     win.blit(speedtxt, (20, 130))

@@ -206,8 +206,8 @@ class World:
                         return False
 
             for j in range(self.sq1 // 2 - 1, self.sq1 // 2 + 2):
-                res = self.now_dr[0] + j * self.gr_main < point[0] - move[0] < self.now_dr[0] + j * self.gr_main + self.gr_main and \
-                      self.now_dr[1] + i * self.gr_main < point[1] - move[1] < self.now_dr[1] + i * self.gr_main + self.gr_main
+                res = self.now_dr[0] + j * self.gr_main <= point[0] - move[0] <= self.now_dr[0] + j * self.gr_main + self.gr_main and \
+                      self.now_dr[1] + i * self.gr_main <= point[1] - move[1] <= self.now_dr[1] + i * self.gr_main + self.gr_main
                 pygame.draw.rect(self.win, (0, 0, 255), (self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
                 if res:
                     if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
