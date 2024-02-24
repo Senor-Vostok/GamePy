@@ -1,13 +1,13 @@
 import pygame
 
 
-class MCharacter(pygame.sprite.Sprite):  # поверить работу!
+class Character(pygame.sprite.Sprite):  # поверить работу!
     def __init__(self, xoy):
         pygame.sprite.Sprite.__init__(self)
-        self.animation_left_move = [pygame.image.load(f'data/character/move/move_left{i}.png').convert_alpha() for i in range(1, 5)]
-        self.animation_right_move = [pygame.image.load(f'data/character/move/move_right{i}.png').convert_alpha() for i in range(1, 5)]
-        self.animation_back_move = [pygame.image.load(f'data/character/move/move_forward{i}.png').convert_alpha() for i in range(1, 5)]
-        self.animation_forward_move = [pygame.image.load(f'data/character/move/move_back{i}.png').convert_alpha() for i in range(1, 5)]
+        self.animation_move = {'left': [pygame.image.load(f'data/character/move/move_left{i}.png').convert_alpha() for i in range(1, 5)],
+                               'right': [pygame.image.load(f'data/character/move/move_right{i}.png').convert_alpha() for i in range(1, 5)],
+                               'back': [pygame.image.load(f'data/character/move/move_forward{i}.png').convert_alpha() for i in range(1, 5)],
+                               'forward': [pygame.image.load(f'data/character/move/move_back{i}.png').convert_alpha() for i in range(1, 5)]}
         self.animation_stay = pygame.image.load('data/character/stay.png').convert_alpha()
         self.animation_stay_right = pygame.image.load('data/character/stay_right.png').convert_alpha()
         self.image = self.animation_stay
@@ -16,6 +16,23 @@ class MCharacter(pygame.sprite.Sprite):  # поверить работу!
         self.action = 'stay'
         self.second_animation = 0
         self.speed_animation = 15
+
+    def event(self, move, speed, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:
+                move[1] = speed
+            if event.key == pygame.K_s:
+                move[1] = -speed
+            if event.key == pygame.K_a:
+                move[0] = speed
+            if event.key == pygame.K_d:
+                move[0] = -speed
+        elif event.type == pygame.KEYUP:
+            if event.key == pygame.K_w or event.key == pygame.K_s:
+                move[1] = 0
+            if event.key == pygame.K_a or event.key == pygame.K_d:
+                move[0] = 0
+        return move
 
     def animation(self, action):
         if action != self.action:
@@ -27,17 +44,8 @@ class MCharacter(pygame.sprite.Sprite):  # поверить работу!
             self.second_animation = 0
             stadia = 0
 
-        if action == 'left':
-            self.image = self.animation_left_move[stadia]
-            self.action = action
-        elif action == 'right':
-            self.image = self.animation_right_move[stadia]
-            self.action = action
-        elif action == 'back':
-            self.image = self.animation_back_move[stadia]
-            self.action = action
-        elif action == 'forward':
-            self.image = self.animation_forward_move[stadia]
+        if action in self.animation_move:
+            self.image = self.animation_move[action][stadia]
             self.action = action
         else:
             if self.action == 'right' or self.action == 'forward':

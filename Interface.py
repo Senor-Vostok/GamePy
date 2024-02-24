@@ -59,6 +59,7 @@ class Buttoncraft(ClassicBar):
         self.text = None
         self.i_have = None
         self.count_have = 0
+
     def do_some(self, change=False):
         if change:
             self.image = self.images[0]

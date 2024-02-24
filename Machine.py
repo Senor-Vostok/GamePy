@@ -2,7 +2,7 @@ import random
 import pygame
 from Sprites_class import Tree, Stone
 from Ground_class import Ground
-from Characters import MCharacter
+from Characters import Character
 from Effects import Effect
 from Resources import Resource
 import Interface
@@ -11,7 +11,6 @@ import Interface
 class World:
     def __init__(self, win, centre, cord, bioms, obj):
         self.import_textures()
-
         # import crafts
         file = open('data/crafters_crafts/crafts.txt', mode='rt').read().split('\n')
         self.crafts = list()
@@ -21,10 +20,9 @@ class World:
         self.craft_number = 0
         self.inventory = dict()
 
-        self.priority = ['sand', 'water', 'flower', 'forest', 'stone', 'snow']  # Приоритеты текстур
+        self.priority = ['sand', 'water_shallow', 'water_midle', 'flower', 'forest', 'stone', 'snow']  # Приоритеты текстур
 
         self.obj = obj[0]
-        self.sel_obj = obj[1]
 
         self.bioms = bioms
         self.gr_main = 180
@@ -50,7 +48,7 @@ class World:
 
         self.world_cord = cord
 
-        self.character = MCharacter((self.centre[0], self.centre[1] - 60))
+        self.character = Character((self.centre[0], self.centre[1] - 60))
 
         self.interface = Interface.Interface(self.centre, self.resources, self.inventory)
 
@@ -149,8 +147,10 @@ class World:
         self.massive_destroy_effects = {'tree': self.effect_break_tree, 'stone': self.effect_break_stone}
 
         # Animations
-        self.water_animation = [pygame.image.load(f'data/animations/water_animations/wave{i}.png').convert_alpha() for i
-                                in range(1, 5)]
+        self.water = {'water_shallow': [pygame.image.load(f'data/animations/water_animations/wave_shallow{i}.png').convert_alpha() for i
+                                in range(1, 5)],
+                      'water_midle': [pygame.image.load(f'data/animations/water_animations/wave_midle{i}.png').convert_alpha() for i
+                                in range(1, 5)]}
         self.tree_animation = [pygame.image.load(f'data/animations/tree_animations/shake{i}.png').convert_alpha() for i
                                in range(1, 8)]
 
@@ -164,7 +164,8 @@ class World:
         # Textures world
         self.land = {'flower': pygame.image.load('data/ground/grass.png').convert_alpha(),
                      'forest': pygame.image.load('data/ground/forest.png').convert_alpha(),
-                     'water': pygame.image.load('data/ground/water.png').convert_alpha(),
+                     'water_shallow': pygame.image.load('data/ground/water.png').convert_alpha(),
+                     'water_midle': pygame.image.load('data/ground/water.png').convert_alpha(),
                      'stone': pygame.image.load('data/ground/stone.png').convert_alpha(),
                      'sand': pygame.image.load('data/ground/sand.png').convert_alpha(),
                      'snow': pygame.image.load('data/ground/snow.png').convert_alpha(),
@@ -206,11 +207,10 @@ class World:
                         return False
 
             for j in range(self.sq1 // 2 - 1, self.sq1 // 2 + 2):
-                res = self.now_dr[0] + j * self.gr_main <= point[0] - move[0] <= self.now_dr[0] + j * self.gr_main + self.gr_main and \
-                      self.now_dr[1] + i * self.gr_main <= point[1] - move[1] <= self.now_dr[1] + i * self.gr_main + self.gr_main
-                pygame.draw.rect(self.win, (0, 0, 255), (self.now_dr[0] + j * self.gr_main, self.now_dr[1] + i * self.gr_main, self.gr_main, self.gr_main), 5)
+                res = self.now_dr[0] + j * self.gr_main <= point[0] - 2 * move[0] <= self.now_dr[0] + j * self.gr_main + self.gr_main and \
+                      self.now_dr[1] + i * self.gr_main <= point[1] - 2 * move[1] <= self.now_dr[1] + i * self.gr_main + self.gr_main
                 if res:
-                    if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water':
+                    if self.bioms[self.world_cord[0] + i][self.world_cord[1] + j] == 'water_midle':
                         return False
         return True
 
@@ -292,10 +292,10 @@ class World:
                     pass
 
     def add_ground(self, i, j, biom):
-        if biom == 'water':
+        if 'water' in biom:
             sprite = Ground(self.land[biom], (
                 self.now_dr[0] + j * self.gr_main + self.gr_main // 2,
-                self.now_dr[1] + i * self.gr_main + self.gr_main // 2), 'water', self.water_animation)
+                self.now_dr[1] + i * self.gr_main + self.gr_main // 2), biom, self.water[biom])
         else:
             sprite = Ground(self.land[biom], (
                 self.now_dr[0] + j * self.gr_main + self.gr_main // 2,

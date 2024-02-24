@@ -5,22 +5,11 @@ from perlin_noise import PerlinNoise
 
 class Generation:
     def __init__(self, massive):
-        self.translate = {0: 'water', 1: 'sand', 2: 'flower', 3: 'forest', 4: 'stone', 5: 'snow'}
-        self.procent = list()
-        self.masbiom = list()
+        self.translate = {0: 'water_midle', 1: 'water_shallow', 2: 'sand', 3: 'flower', 4: 'forest', 5: 'stone', 6: 'snow'}
+        self.masbiom = [[None for _ in range(massive)] for _ in range(massive)]
         self.masive = massive
         self.coord_objects = list()
         self.select_cord_objects = list()
-        for i in range(massive):
-            prom = list()
-            for j in range(massive):
-                prom.append(0)
-            self.procent.append(prom)
-        for i in range(massive):
-            prom = list()
-            for j in range(massive):
-                prom.append(0)
-            self.masbiom.append(prom)
 
     def add_on_world(self, klak, llack, chance, instx, insty, name):
         if random.randint(1, chance) == 1:
@@ -55,38 +44,31 @@ class Generation:
             self.select_cord_objects.append(prom2)
         return [self.coord_objects, self.select_cord_objects]
 
-    def weathering(self):
-        for i in range(1, len(self.masbiom) - 1):
-            for j in range(1, len(self.masbiom[i]) - 1):
-                close = [self.masbiom[i - 1][j - 1], self.masbiom[i - 1][j], self.masbiom[i - 1][j + 1],
-                         self.masbiom[i][j - 1], self.masbiom[i][j + 1], self.masbiom[i + 1][j - 1],
-                         self.masbiom[i + 1][j], self.masbiom[i + 1][j + 1]]
-                if 'water' in close and self.masbiom[i][j] != 'water' and self.masbiom[i][j] != 'forest':
-                    self.masbiom[i][j] = 'sand'
-
     def add_barier(self, size):
         for i in range(self.masive + size * 2):
             if i < size:
-                self.masbiom.insert(0, ['water'] * (self.masive + size * 2))
+                self.masbiom.insert(0, ['water_midle'] * (self.masive + size * 2))
             elif i >= self.masive + size:
-                self.masbiom.append(['water'] * (self.masive + size * 2))
+                self.masbiom.append(['water_midle'] * (self.masive + size * 2))
             else:
-                self.masbiom[i] = ['water'] * size + self.masbiom[i] + ['water'] * size
+                self.masbiom[i] = ['water_midle'] * size + self.masbiom[i] + ['water_midle'] * size
         return self.masbiom
 
     def get_key(self, z):
-        if z < -6:
+        if z < -8:
             return 0
-        elif z in range(-6, -5):
+        elif z in range(-8, -6):
             return 1
-        elif z in range(-5, -2):
+        elif z in range(-6, -5):
             return 2
-        elif z in range(-2, 2):
+        elif z in range(-5, -2):
             return 3
-        elif z in range(1, 7):
+        elif z in range(-2, 2):
             return 4
-        else:
+        elif z in range(1, 7):
             return 5
+        else:
+            return 6
 
     def generation(self):
         seed = random.randint(1000, 9000)
