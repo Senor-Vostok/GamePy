@@ -46,11 +46,11 @@ class World:
         self.resources_on_world = list()
         self.effects = list()
 
-        self.world_cord = cord
+        self.world_cord = cord  # позиция курсора
 
-        self.character = Character((self.centre[0], self.centre[1] - 60))
+        self.character = Character((self.centre[0], self.centre[1] - 60))  # Создание ведущего курсора/персонажа
 
-        self.interface = Interface.Interface(self.centre, self.resources, self.inventory)
+        self.interface = Interface.Interface(self.centre, self.resources, self.inventory)  # Интерфейс
 
         self.synchronous = 0  # Синхронизация анимации связных объектов
 

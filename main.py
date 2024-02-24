@@ -9,7 +9,7 @@ width = GetSystemMetrics(0)
 height = GetSystemMetrics(1)
 centre = (width // 2, height // 2)
 pygame.init()
-win = pygame.display.set_mode((width, height), vsync=1)
+win = pygame.display.set_mode((width, height))
 my_font = pygame.font.SysFont('Futura book C', 30)
 
 clock = pygame.time.Clock()
@@ -17,14 +17,14 @@ clock = pygame.time.Clock()
 win.blit(pygame.image.load('data/loading/loading1.png').convert_alpha(), (centre[0] - 500, centre[1] - 250))
 
 pygame.display.update()
-normal_fps = 70
-speed = 7
+normal_fps = 60
+speed = 6
 const_for_speed = normal_fps * speed  # не использовать 300!!!!
 
 size_world = 200
 gen = Generation(size_world)
-world_pos_x = 20
-world_pos_y = 20
+world_pos_x = size_world // 2
+world_pos_y = size_world // 2
 gen.generation()
 matr_worls = gen.add_barier(15)
 obj = gen.xy_objects()

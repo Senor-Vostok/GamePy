@@ -6,7 +6,6 @@ import pygame
 class Ground(pygame.sprite.Sprite):
     def __init__(self, image, xoy, name, animation=None):
         pygame.sprite.Sprite.__init__(self)
-        self.thisob = pygame.image.load('data/ground/barrier.png').convert_alpha()
         self.t = image
         self.animation = animation
         self.name = name

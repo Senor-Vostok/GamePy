@@ -1,6 +1,7 @@
 import random
 from numpy import floor
 from perlin_noise import PerlinNoise
+import matplotlib.pyplot as plt
 
 
 class Generation:
@@ -55,33 +56,37 @@ class Generation:
         return self.masbiom
 
     def get_key(self, z):
-        if z < -8:
+        p = -65
+        if z < p:
             return 0
-        elif z in range(-8, -6):
+        elif z in range(-65, -58):
             return 1
-        elif z in range(-6, -5):
+        elif z in range(-58, -50):
             return 2
-        elif z in range(-5, -2):
+        elif z in range(-50, -42):
             return 3
-        elif z in range(-2, 2):
+        elif z in range(-42, 0):
             return 4
-        elif z in range(1, 7):
+        elif z in range(0, 50):
             return 5
-        else:
-            return 6
+        return 6
 
     def generation(self):
-        seed = random.randint(1000, 9000)
-        noise = PerlinNoise(octaves=7, seed=seed)
-        amp = 14
-        period = 100
+        seed = random.randint(10000, 40000)
+        noise = PerlinNoise(octaves=5, seed=seed)
+        amp = 20
+        period = (100 * self.masive) // 200
         landscale = [[0 for _ in range(self.masive)] for _ in range(self.masive)]
-        for position in range(self.masive ** 2):
-            x = floor(position / self.masive)
-            z = floor(position % self.masive)
-            y = floor(noise([x / period, z / period]) * amp)
-            landscale[int(x)][int(z)] = self.get_key(int(y))
+        centre = (self.masive / 2, self.masive / 2)
+        for x in range(self.masive):
+            for y in range(self.masive):
+                d = floor((200 / self.masive) * ((y - centre[0]) ** 2 + (x - centre[1]) ** 2) ** 0.5)
+                e = floor(noise([x / period, y / period]) * amp)
+                e = floor(e ** 2 - d)
+                landscale[x][y] = self.get_key(int(e))
         for i in range(self.masive):
             for j in range(self.masive):
                 self.masbiom[i][j] = self.translate[landscale[i][j]]
+        plt.imshow(landscale)
+        plt.show()
         return self.masbiom
